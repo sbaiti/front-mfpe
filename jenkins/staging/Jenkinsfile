@@ -1,0 +1,67 @@
+pipeline {
+    agent {
+        docker {
+            image 'node:8.16.0-jessie'
+            args '-p 3021:3000 -u root'
+        }
+    }
+    environment {
+        CI = 'false'
+        server_pass = credentials('FRONTINM_password')
+    }
+    stages {
+        stage('setup') {
+            steps {
+                sh 'npm install '
+
+                  }
+            }
+    
+  stage('Lint Test') {
+            steps {
+                sh ' npm run lint '
+            }
+                       
+    }
+            stage('Build') {
+            steps {
+                sh ' npm run build '
+            }
+                       
+    }
+    
+    stage('Deploy ssh Cynapsys'){
+        steps {
+       
+            script {
+                withCredentials([string(credentialsId: 'FRONTINM_password', variable: 'FRONTINM_password')]) {
+                def remote = [:]
+               remote.name = 'distro'
+                remote.host = '10.1.1.50'
+                remote.user = 'root'
+                remote.password = FRONTINM_password
+                remote.allowAnyHosts = true
+                stage('Remote SSH') {
+                  sshCommand remote: remote, command: " rm -rf /var/www/html/MfpeStaging/FrontMFPE/build "
+                sshPut remote: remote, from: '/var/lib/jenkins/workspace/FrontMFPE_Staging/build', into: '/var/www/html/MfpeStaging/FrontMFPE'
+           
+           
+           
+            }
+            }
+        }}}
+    
+
+    
+    
+    stage('notifications'){
+    steps {
+        mail bcc: 'Notif MFPE Web Staging', body: '''
+        
+        Le déploiement de MFPE Web Staging est terminé avec succès  . \n Lien interne develop : http://10.1.1.50:41 \n Lien interne staging : http://10.1.1.50:49 \n  Lien externe :  http://41.226.165.26:8216/ \n  
+        ''', cc: 'chaouki.benalaya@gfi-tunisie.com ,safouane.fatin@gfi-tunisie.com , ibrahim.haouari@gfi-tunisie.com,abdeladel.majdeb@gfi-tunisie.com ', from: 'jenkins@gfi-tunisie.com', replyTo: '', subject: 'Notif Devops MFPE_Front_Staging', to: 'houssem.khaldi@gfi-tunisie.com'
+    
+        }
+            }
+    }
+}

@@ -1,0 +1,29 @@
+[
+    {
+        "governorate": "Tunis",
+        "population": "12536500",
+        "activePopulation": "8600700",
+        "occupiedActivePopulation": "196200",
+        "unemployment": "68540",
+        "unemploymentRate": "31%",
+        "numberOfCompanies": "5270"
+    },
+    {
+        "governorate": "Nabeul",
+        "population": "1536500",
+        "activePopulation": "800700",
+        "occupiedActivePopulation": "16200",
+        "unemployment": "6540",
+        "unemploymentRate": "21%",
+        "numberOfCompanies": "570"
+    },
+    {
+        "governorate": "Ariana",
+        "population": "123500",
+        "activePopulation": "860700",
+        "occupiedActivePopulation": "19620",
+        "unemployment": "6850",
+        "unemploymentRate": "35%",
+        "numberOfCompanies": "570"
+    }
+]

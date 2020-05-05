@@ -1,0 +1,519 @@
+[
+    {
+        "id": 1,
+        "name": "sidebar",
+        "items": [
+            {
+                "id": 1,
+                "title": "informations",
+                "link": "/mes-informations",
+                "roles": [
+                    "ROLE_CITOYEN",
+                    "ROLE_AGENT_DR1",
+                    "ROLE_AGENT_DR2",
+                    "ROLE_AGENT_DR3",
+                    "ROLE_AGENT_DR4",
+                    "ROLE_AGENT_MFPE",
+                    "ROLE_AGENT_CENTRE_FORMATION",
+                    "ROLE_DIRECTEUR_DR",
+                    "ROLE_ADMIN",
+                    "ROLE_CYNAPSYS",
+                    "ROLE_SUPER_ADMIN"
+                ],
+                "defaultPermission": true
+            },
+            {
+                "link": "/demande/liste/",
+                "id": 2,
+                "title": "demands",
+                "defaultPermission": false,
+                "roles": [
+                    "ROLE_CITOYEN",
+                    "ROLE_AGENT_DR1",
+                    "ROLE_AGENT_DR2",
+                    "ROLE_AGENT_DR3",
+                    "ROLE_AGENT_DR4",
+                    "ROLE_AGENT_MFPE",
+                    "ROLE_DIRECTEUR_DR",
+                    "ROLE_AGENT_CENTRE_FORMATION",
+                    "ROLE_ADMIN",
+                    "ROLE_CYNAPSYS",
+                    "ROLE_SUPER_ADMIN"
+                ],
+                "subitems": [
+                    {
+                        "id": 24,
+                        "link": "/demande/liste/nouveau",
+                        "title": "newApplicationsList",
+                        "defaultPermission": false,
+                        "roles": ["ROLE_CITOYEN"]
+                    },
+                    {
+                        "id": 21,
+                        "name": "inProgress",
+                        "link": "/demande/liste/en-cours",
+                        "title": "inProgressApplicationsList",
+                        "defaultPermission": false,
+                        "roles": ["ROLE_CITOYEN"]
+                    },
+                    {
+                        "id": 22,
+                        "link": "/demande/liste/rejetées",
+                        "title": "rejectedApplicationsList",
+                        "defaultPermission": false,
+                        "roles": ["ROLE_CITOYEN"]
+                    },
+                    {
+                        "id": 23,
+                        "link": "/demande/liste/clôturés",
+                        "title": "closedApplicationsList",
+                        "defaultPermission": false,
+                        "roles": ["ROLE_CITOYEN"]
+                    }
+                ]
+            },
+            {
+                "id": 3,
+                "title": "consultDemands",
+                "link": "/archive",
+                "defaultPermission": false,
+                "roles": [
+                    "ROLE_AGENT_DR1",
+                    "ROLE_AGENT_DR2",
+                    "ROLE_AGENT_DR3",
+                    "ROLE_AGENT_DR4",
+                    "ROLE_AGENT_MFPE",
+                    "ROLE_AGENT_CENTRE_FORMATION",
+                    "ROLE_DIRECTEUR_DR",
+                    "ROLE_ADMIN",
+                    "ROLE_CYNAPSYS",
+                    "ROLE_SUPER_ADMIN"
+                ]
+            },
+            {
+                "id": 4,
+                "title": "collectData",
+                "roles": ["ROLE_SUPER_ADMIN", "ROLE_ADMIN", "ROLE_CYNAPSYS"],
+                "defaultPermission": false,
+                "subitems": [
+                    {
+                        "id": 41,
+                        "link": "/formulaires/projets/projets_publics",
+                        "title": "publicProjects",
+                        "defaultPermission": false,
+                        "roles": [
+                            "ROLE_SUPER_ADMIN",
+                            "ROLE_ADMIN",
+                            "ROLE_CYNAPSYS"
+                        ]
+                    },
+                    {
+                        "id": 42,
+                        "link": "/formulaires/projets/projets_coopération_internationale",
+                        "title": "internationalProjectsCooperation",
+                        "defaultPermission": false,
+                        "roles": [
+                            "ROLE_SUPER_ADMIN",
+                            "ROLE_ADMIN",
+                            "ROLE_CYNAPSYS"
+                        ]
+                    },
+                    {
+                        "id": 43,
+                        "link": "/formulaires/inscrit-secteur-public",
+                        "title": "inscrit-secteur-public",
+                        "defaultPermission": false,
+                        "roles": [
+                            "ROLE_SUPER_ADMIN",
+                            "ROLE_ADMIN",
+                            "ROLE_CYNAPSYS"
+                        ]
+                    },
+                    {
+                        "id": 44,
+                        "link": "/formulaires/diplomé-secteur-public",
+                        "title": "diplomé-secteur-public",
+                        "defaultPermission": false,
+                        "roles": [
+                            "ROLE_SUPER_ADMIN",
+                            "ROLE_ADMIN",
+                            "ROLE_CYNAPSYS"
+                        ]
+                    },
+                    {
+                        "id": 45,
+                        "link": "/formulaires/inscrit-secteur-privé",
+                        "title": "inscrit-secteur-privé",
+                        "defaultPermission": false,
+                        "roles": [
+                            "ROLE_SUPER_ADMIN",
+                            "ROLE_ADMIN",
+                            "ROLE_CYNAPSYS"
+                        ]
+                    },
+                    {
+                        "id": 46,
+                        "link": "/formulaires/diplomé-secteur-privé",
+                        "title": "diplomé-secteur-privé",
+                        "defaultPermission": false,
+                        "roles": [
+                            "ROLE_SUPER_ADMIN",
+                            "ROLE_ADMIN",
+                            "ROLE_CYNAPSYS"
+                        ]
+                    },
+                    {
+                        "id": 47,
+                        "link": "/formulaires/centres/nombre-centres-formation-privée",
+                        "title": "privateCenterNumber",
+                        "defaultPermission": false,
+                        "roles": [
+                            "ROLE_SUPER_ADMIN",
+                            "ROLE_ADMIN",
+                            "ROLE_CYNAPSYS"
+                        ]
+                    }
+                ]
+            },
+            {
+                "id": 5,
+                "title": "donneesSecteurSocio",
+                "defaultPermission": false,
+                "roles": [
+                    "ROLE_SUPER_ADMIN",
+                    "ROLE_ADMIN",
+                    "ROLE_CYNAPSYS",
+                    "ROLE_AGENT_DR1",
+                    "ROLE_AGENT_DR2",
+                    "ROLE_AGENT_DR3",
+                    "ROLE_AGENT_DR4"
+                ],
+                "subitems": [
+                    {
+                        "id": 51,
+                        "title": "formAdd",
+                        "defaultPermission": false,
+                        "link": "/formulaires/gestion-des-données/socioéconomiques",
+                        "roles": [
+                            "ROLE_SUPER_ADMIN",
+                            "ROLE_ADMIN",
+                            "ROLE_CYNAPSYS",
+                            "ROLE_AGENT_DR1",
+                            "ROLE_AGENT_DR2",
+                            "ROLE_AGENT_DR3",
+                            "ROLE_AGENT_DR4"
+                        ]
+                    },
+                    {
+                        "id": 52,
+                        "title": "uploadFile",
+                        "defaultPermission": false,
+                        "link": "/formulaires/gestion-des-données/socioéconomiques/telecharger",
+                        "roles": [
+                            "ROLE_SUPER_ADMIN",
+                            "ROLE_ADMIN",
+                            "ROLE_CYNAPSYS",
+                            "ROLE_AGENT_DR1",
+                            "ROLE_AGENT_DR2",
+                            "ROLE_AGENT_DR3",
+                            "ROLE_AGENT_DR4"
+                        ]
+                    }
+                ]
+            },
+            {
+                "id": 6,
+                "title": "donneesSecteurEmploi",
+                "defaultPermission": false,
+                "roles": [
+                    "ROLE_SUPER_ADMIN",
+                    "ROLE_ADMIN",
+                    "ROLE_CYNAPSYS",
+                    "ROLE_AGENT_DR1",
+                    "ROLE_AGENT_DR2",
+                    "ROLE_AGENT_DR3",
+                    "ROLE_AGENT_DR4"
+                ],
+                "subitems": [
+                    {
+                        "id": 61,
+                        "title": "donneesBts",
+                        "defaultPermission": false,
+                        "link": "/donnees-bts/telecharger",
+                        "roles": [
+                            "ROLE_SUPER_ADMIN",
+                            "ROLE_ADMIN",
+                            "ROLE_CYNAPSYS"
+                        ]
+                    },
+                    {
+                        "id": 62,
+                        "title": "projectAPI",
+                        "defaultPermission": false,
+                        "link": "/investissement/api",
+                        "roles": [
+                            "ROLE_SUPER_ADMIN",
+                            "ROLE_ADMIN",
+                            "ROLE_CYNAPSYS"
+                        ]
+                    },
+                    {
+                        "id": 63,
+                        "title": "projectAPIA",
+                        "defaultPermission": false,
+                        "link": "/investissement/apia",
+                        "roles": [
+                            "ROLE_SUPER_ADMIN",
+                            "ROLE_ADMIN",
+                            "ROLE_CYNAPSYS"
+                        ]
+                    },
+                    {
+                        "id": 64,
+                        "title": "numberEntrepDiffic",
+                        "defaultPermission": false,
+                        "link": "/investissement/entreprise-en-difficulté",
+                        "roles": [
+                            "ROLE_SUPER_ADMIN",
+                            "ROLE_ADMIN",
+                            "ROLE_CYNAPSYS"
+                        ]
+                    },
+                    {
+                        "id": 65,
+                        "title": "donneesAneti",
+                        "defaultPermission": false,
+                        "link": "#",
+                        "dev": true,
+                        "roles": [
+                            "ROLE_SUPER_ADMIN",
+                            "ROLE_ADMIN",
+                            "ROLE_CYNAPSYS"
+                        ]
+                    }
+                ]
+            },
+            {
+                "id": 7,
+                "title": "editique",
+                "defaultPermission": false,
+                "roles": [
+                    "ROLE_AGENT_DR1",
+                    "ROLE_AGENT_DR2",
+                    "ROLE_AGENT_DR3",
+                    "ROLE_AGENT_DR4",
+                    "ROLE_AGENT_MFPE",
+                    "ROLE_AGENT_CENTRE_FORMATION",
+                    "ROLE_DIRECTEUR_DR",
+                    "ROLE_ADMIN",
+                    "ROLE_CYNAPSYS",
+                    "ROLE_SUPER_ADMIN"
+                ],
+                "subitems": [
+                    {
+                        "id": 71,
+                        "title": "dashboard",
+                        "defaultPermission": false,
+                        "roles": [
+                            "ROLE_AGENT_DR1",
+                            "ROLE_AGENT_DR2",
+                            "ROLE_AGENT_DR3",
+                            "ROLE_AGENT_DR4",
+                            "ROLE_AGENT_MFPE",
+                            "ROLE_AGENT_CENTRE_FORMATION",
+                            "ROLE_DIRECTEUR_DR",
+                            "ROLE_ADMIN",
+                            "ROLE_CYNAPSYS",
+                            "ROLE_SUPER_ADMIN"
+                        ],
+                        "subsubitems": [
+                            {
+                                "id": 711,
+                                "title": "affichageStandard",
+                                "defaultPermission": true,
+                                "link": "#",
+                                "dev": true,
+                                "roles": [
+                                    "ROLE_SUPER_ADMIN",
+                                    "ROLE_ADMIN",
+                                    "ROLE_CYNAPSYS"
+                                ]
+                            },
+                            {
+                                "id": 712,
+                                "title": "affichagePersonnalisé",
+                                "defaultPermission": true,
+                                "link": "#",
+                                "dev": true,
+                                "roles": [
+                                    "ROLE_SUPER_ADMIN",
+                                    "ROLE_ADMIN",
+                                    "ROLE_CYNAPSYS"
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "id": 72,
+                        "title": "ficheDescriptive",
+                        "defaultPermission": false,
+                        "dev": true,
+                        "link": "#",
+                        "roles": [
+                            "ROLE_AGENT_DR1",
+                            "ROLE_AGENT_DR2",
+                            "ROLE_AGENT_DR3",
+                            "ROLE_AGENT_DR4",
+                            "ROLE_AGENT_MFPE",
+                            "ROLE_AGENT_CENTRE_FORMATION",
+                            "ROLE_DIRECTEUR_DR",
+                            "ROLE_ADMIN",
+                            "ROLE_CYNAPSYS",
+                            "ROLE_SUPER_ADMIN"
+                        ]
+                    },
+                    {
+                        "id": 73,
+                        "title": "regionalNewsletter",
+                        "defaultPermission": false,
+                        "link": "#",
+                        "dev": true,
+                        "roles": [
+                            "ROLE_SUPER_ADMIN",
+                            "ROLE_ADMIN",
+                            "ROLE_CYNAPSYS"
+                        ]
+                    }
+                ]
+            },
+            {
+                "id": 8,
+                "title": "accessProfilingManagment",
+                "defaultPermission": false,
+                "link": "#",
+                "roles": ["ROLE_SUPER_ADMIN", "ROLE_ADMIN", "ROLE_CYNAPSYS"],
+                "subitems": [
+                    {
+                        "id": 81,
+                        "title": "agentsManagement",
+                        "defaultPermission": false,
+                        "link": "/gestion-accees/agents",
+                        "roles": [
+                            "ROLE_SUPER_ADMIN",
+                            "ROLE_ADMIN",
+                            "ROLE_CYNAPSYS"
+                        ]
+                    },
+                    {
+                        "id": 82,
+                        "title": "rolesManagement",
+                        "defaultPermission": false,
+                        "link": "/gestion-roles",
+                        "roles": [
+                            "ROLE_SUPER_ADMIN",
+                            "ROLE_ADMIN",
+                            "ROLE_CYNAPSYS"
+                        ]
+                    }
+                ]
+            },
+            {
+                "id": 9,
+                "title": "nomenclatures",
+                "defaultPermission": false,
+                "link": "#",
+                "roles": [
+                    "ROLE_AGENT_DR1",
+                    "ROLE_AGENT_DR2",
+                    "ROLE_AGENT_DR3",
+                    "ROLE_AGENT_DR4",
+                    "ROLE_AGENT_MFPE",
+                    "ROLE_AGENT_CENTRE_FORMATION",
+                    "ROLE_DIRECTEUR_DR",
+                    "ROLE_ADMIN",
+                    "ROLE_CYNAPSYS",
+                    "ROLE_SUPER_ADMIN"
+                ],
+                "subitems": [
+                    {
+                        "id": 91,
+                        "title": "trainingCenterList",
+                        "defaultPermission": false,
+                        "link": "/centre-de-formation/liste",
+                        "roles": [
+                            "ROLE_AGENT_DR1",
+                            "ROLE_AGENT_DR2",
+                            "ROLE_AGENT_DR3",
+                            "ROLE_AGENT_DR4",
+                            "ROLE_AGENT_MFPE",
+                            "ROLE_AGENT_CENTRE_FORMATION",
+                            "ROLE_DIRECTEUR_DR",
+                            "ROLE_ADMIN",
+                            "ROLE_CYNAPSYS",
+                            "ROLE_SUPER_ADMIN"
+                        ]
+                    },
+                    {
+                        "id": 92,
+                        "title": "specialities",
+                        "defaultPermission": false,
+                        "link": "/specialites/liste",
+                        "roles": [
+                            "ROLE_AGENT_DR1",
+                            "ROLE_AGENT_DR2",
+                            "ROLE_AGENT_DR3",
+                            "ROLE_AGENT_DR4",
+                            "ROLE_AGENT_MFPE",
+                            "ROLE_AGENT_CENTRE_FORMATION",
+                            "ROLE_DIRECTEUR_DR",
+                            "ROLE_ADMIN",
+                            "ROLE_CYNAPSYS",
+                            "ROLE_SUPER_ADMIN"
+                        ]
+                    },
+                    {
+                        "id": 93,
+                        "link": "/referentiels/liste",
+                        "title": "referencesList",
+                        "defaultPermission": false,
+                        "roles": [
+                            "ROLE_SUPER_ADMIN",
+                            "ROLE_ADMIN",
+                            "ROLE_CYNAPSYS"
+                        ]
+                    },
+                    {
+                        "id": 94,
+                        "link": "/unite-regionale/liste",
+                        "title": "ruList",
+                        "defaultPermission": false,
+                        "roles": [
+                            "ROLE_SUPER_ADMIN",
+                            "ROLE_ADMIN",
+                            "ROLE_CYNAPSYS"
+                        ]
+                    }
+                ]
+            },
+            {
+                "id": 10,
+                "title": "disconnect",
+                "defaultPermission": true,
+                "link": "#",
+                "roles": [
+                    "ROLE_CITOYEN",
+                    "ROLE_AGENT_DR1",
+                    "ROLE_AGENT_DR2",
+                    "ROLE_AGENT_DR3",
+                    "ROLE_AGENT_DR4",
+                    "ROLE_AGENT_MFPE",
+                    "ROLE_DIRECTEUR_DR",
+                    "ROLE_AGENT_CENTRE_FORMATION",
+                    "ROLE_ADMIN",
+                    "ROLE_CYNAPSYS",
+                    "ROLE_SUPER_ADMIN"
+                ]
+            }
+        ]
+    }
+]

@@ -1,0 +1,134 @@
+pipeline {
+
+
+                agent {
+        docker {
+            image 'node:8.16.0-jessie'
+            args '-p 3021:3000 -u root'
+        }
+    }
+    
+    environment {
+        CI = 'false'
+        server_pass = credentials('FRONTINM_password')
+    }
+    stages {
+    
+    
+    
+//        stage('Analyse Qualité'){
+//    agent any
+ //   steps{
+  //      dir ("/var/lib/jenkins/workspace/FrontMFPE"){
+//            withSonarQubeEnv('sonar_mouheb') {
+  //             sh '/opt/sonar-scanner/bin/sonar-scanner \
+//  -Dsonar.projectKey=FrontMFPE \
+//  -Dsonar.sources=. \
+//  -Dsonar.host.url=http://10.1.1.113 \
+//  -Dsonar.login=7e15054a946f508a3a76247394ff1803b2eb28b0 '
+        
+
+  //          }
+
+    
+//        }
+//    }}
+
+    
+    
+    
+    
+        stage('setup') {
+
+            steps {
+            
+            
+                
+
+        
+                   
+                 sh 'npm install '
+            
+                       
+            }}
+    
+  stage('Lint Test') {
+
+    
+            steps {
+                sh ' npm run lint '
+            
+                       
+            } }
+            
+                        stage('Build') {
+          steps {
+          
+                sh ' npm run build '
+            
+                       
+    }}
+    
+    stage('Deploy ssh Cynapsys'){
+        steps {
+       
+            script {
+                withCredentials([string(credentialsId: 'FRONTINM_password', variable: 'FRONTINM_password')]) {
+                def remote = [:]
+               remote.name = 'distro'
+                remote.host = '10.1.1.50'
+                remote.user = 'root'
+                remote.password = FRONTINM_password
+                remote.allowAnyHosts = true
+                stage('Remote SSH') {
+                  sshCommand remote: remote, command: " rm -rf /var/www/html/FrontMFPE/build"
+                   //sshCommand remote: remote, command: " rm -rf /var/www/html/FrontMFPEExterne/build "
+                sshPut remote: remote, from: '/var/lib/jenkins/workspace/FrontMFPE/build', into: '/var/www/html/FrontMFPE'
+                //sshPut remote: remote, from: '/var/lib/jenkins/workspace/FrontMFPE/build', into: '/var/www/html/FrontMFPEExterne'
+                
+                }
+            
+            
+            
+            
+            
+              
+             
+
+                  }
+            }}}
+    
+
+
+    
+    
+    stage('notifications'){
+    
+    steps {
+        mail bcc: 'Notif MFPE Web ', body: '''
+        
+        Le déploiement de MFPE Web  est terminé avec succès  . \n Lien interne : http://10.1.1.50:41 \n  Lien externe :  http://41.226.165.26:8216/ \n  http://10.1.1.104:10004/JENKINS_ZAP_VULNERABILITY_REPORT.html \n
+        ''', cc: 'chaouki.benalaya@gfi-tunisie.com ,safouane.fatin@gfi-tunisie.com , ibrahim.haouari@gfi-tunisie.com,abdeladel.majdeb@gfi-tunisie.com , fatma.hbal@gfi-tunisie.com', from: 'jenkins@gfi-tunisie.com', replyTo: '', subject: 'Notif Devops MFPE_WEB', to: 'houssem.khaldi@gfi-tunisie.com'
+    
+        
+            }}
+            
+            
+                stage('OWASP report'){
+
+    steps { 
+    
+    sh ' echo test sec '
+    
+           // dir("/var/lib/jenkins/workspace/MFPE_Security/reports") {
+
+         //   sh 'screen -d -m python -m SimpleHTTPServer 10004'
+
+
+  //  }
+    }
+}
+}
+            
+ }           
+

@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <title>JSDoc: Source: components/home/MapBlock/index.jsx</title>
+
+        <script src="scripts/prettify/prettify.js"></script>
+        <script src="scripts/prettify/lang-css.js"></script>
+        <!--[if lt IE 9]>
+            <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+        <![endif]-->
+        <link
+            type="text/css"
+            rel="stylesheet"
+            href="styles/prettify-tomorrow.css"
+        />
+        <link
+            type="text/css"
+            rel="stylesheet"
+            href="styles/jsdoc-default.css"
+        />
+    </head>
+
+    <body>
+        <div id="main">
+            <h1 class="page-title">
+                Source: components/home/MapBlock/index.jsx
+            </h1>
+
+            <section>
+                <article>
+                    <pre
+                        class="prettyprint source linenums"
+                    ><code>/* eslint-disable react/forbid-prop-types */
+import React, { Fragment } from 'react'
+import { Select, Container, FormControl, MenuItem } from '@material-ui/core'
+import { injectIntl } from 'react-intl'
+import PropTypes from 'prop-types'
+import { connect } from 'react-redux'
+import CircularProgress from '@material-ui/core/CircularProgress'
+import TunisiaMap from '../../ui/tunisiaMap'
+import getAllReferenceActions from '../../../redux/referencial/getAllReferencial'
+
+/**
+ *  Home Page - Map Block -
+ *
+ * @class MapBlock
+ * @extends {React.Component}
+ */
+class MapBlock extends React.Component {
+    static propTypes = {
+        language: PropTypes.string.isRequired,
+        refResponse: PropTypes.object,
+    }
+
+    static defaultProps = {
+        refResponse: {},
+    }
+
+    state = {
+        open: false,
+        gov: '',
+        cityName: '',
+        posX: 0,
+        posY: 0,
+        display: 'none',
+        mapData: null,
+    }
+
+    componentDidMount = () => {
+        document.addEventListener('mousemove', this.handleMouseMove, false)
+        const { refResponse } = this.props
+        if (refResponse.referenciels.RefGouvernorat)
+            this.govReferencesToProps(refResponse.referenciels.RefGouvernorat)
+    }
+
+    componentWillUnmount = () => {
+        document.removeEventListener('mousemove', this.handleMouseMove, false)
+    }
+
+    /**
+     *
+     * @param {array} govReferences
+     * @memberof MapBlock
+     */
+    govReferencesToProps = govReferences => {
+        const data = []
+        govReferences.forEach(item => {
+            data[item.code] = {
+                intituleFr: item.intituleFr,
+                intituleAr: item.intituleAr,
+            }
+        })
+        this.setState({ mapData: data })
+    }
+
+    /**
+     * Show City Name
+     *
+     * @param {object} e
+     * @memberof MapBlock
+     */
+    showCityName = e => {
+        const { mapData } = this.state
+        const city = mapData ? mapData[e.target.id] : null
+        if (city !== null &amp;&amp; city !== '' &amp;&amp; city !== undefined) {
+            this.setState({
+                cityName: city,
+                posX: e.clientX,
+                posY: e.clientY,
+                display: 'block',
+            })
+        } else {
+            this.hideCityName()
+        }
+    }
+
+    /**
+     * Hide City Name
+     *
+     * @memberof MapBlock
+     */
+    hideCityName = () => {
+        this.setState({
+            cityName: '',
+        })
+    }
+
+    /**
+     * Handle Close
+     *
+     * @memberof MapBlock
+     */
+    handleClose = () => {
+        this.setState({ open: false })
+    }
+
+    /**
+     * Handle Open
+     *
+     * @memberof MapBlock
+     */
+    handleOpen = () => {
+        this.setState({ open: true })
+    }
+
+    /**
+     * Handle Change
+     *
+     * @param {object} event
+     * @memberof MapBlock
+     */
+    handleChange = event => {
+        let gov = null
+        gov =
+            event.target &amp;&amp; event.target.id
+                ? event.target.id
+                : event.target.value
+        this.setState({ gov })
+    }
+
+    render() {
+        const { open, gov, cityName, posX, posY, display } = this.state
+        const { refResponse, language } = this.props
+        console.log(refResponse, 'statestate')
+        return (
+            &lt;Container
+                maxWidth="sm"
+                className="map-block d-flex flex-column align-items-center h-100"
+            >
+                {refResponse ? (
+                    &lt;Fragment>
+                        &lt;div className="d-flex">
+                            &lt;FormControl>
+                                &lt;Select
+                                    open={open}
+                                    onClose={this.handleClose}
+                                    onOpen={this.handleOpen}
+                                    value={gov}
+                                    onChange={this.handleChange}
+                                    inputProps={{
+                                        name: 'gov',
+                                        id: 'demo-controlled-open-select',
+                                    }}
+                                >
+                                    {(
+                                        refResponse.referenciels
+                                            .RefGouvernorat || []
+                                    ).map(ref => {
+                                        return (
+                                            &lt;MenuItem
+                                                key={ref.id}
+                                                value={ref.code}
+                                            >
+                                                {language === 'fr'
+                                                    ? ref.intituleFr
+                                                    : ref.intituleAr}
+                                            &lt;/MenuItem>
+                                        )
+                                    })}
+                                &lt;/Select>
+                            &lt;/FormControl>
+                        &lt;/div>
+                        &lt;div className="d-flex h-100">
+                            &lt;div
+                                style={{
+                                    position: 'fixed',
+                                    top: `${posY - 30}px`,
+                                    left: `${posX}px`,
+                                    zIndex: 9999,
+                                    color: 'rgb(8, 25, 57)',
+                                    padding: '0 10px',
+                                    background: 'rgba(255, 255, 255, 0.7)',
+                                    borderRadius: 9,
+                                    pointerEvents: 'none',
+                                    fontWeight: 'bolder',
+                                    display,
+                                }}
+                            >
+                                {language === 'fr'
+                                    ? cityName.intituleFr
+                                    : cityName.intituleAr}
+                            &lt;/div>
+                            &lt;TunisiaMap
+                                viewBox="0 0 290.8 650.7"
+                                width="100%"
+                                height="100%"
+                                onMouseMove={this.showCityName}
+                                onMouseLeave={this.hideCityName}
+                            />
+                        &lt;/div>
+                    &lt;/Fragment>
+                ) : (
+                    &lt;CircularProgress disableShrink />
+                )}
+            &lt;/Container>
+        )
+    }
+}
+
+const mapStateToProps = state => {
+    return {
+        language: state.info.language,
+        refResponse: state.referencial.allReferencials.response,
+    }
+}
+const mapDispatchToProps = dispatch => ({
+    getAllReferentiels: () =>
+        dispatch(getAllReferenceActions.getAllReferenceRequest()),
+})
+
+export default connect(
+    mapStateToProps,
+    mapDispatchToProps
+)(injectIntl(MapBlock))
+</code></pre>
+                </article>
+            </section>
+        </div>
+
+        <nav>
+            <h2><a href="index.html">Home</a></h2>
+            <h3>Classes</h3>
+            <ul>
+                <li><a href="AccessForm.html">AccessForm</a></li>
+                <li><a href="AccessForm.AccessForm.html">AccessForm</a></li>
+                <li><a href="AddReferentiel.html">AddReferentiel</a></li>
+                <li>
+                    <a href="AddReferentiel.AddReferentiel.html"
+                        >AddReferentiel</a
+                    >
+                </li>
+                <li><a href="AddUniteRegionale.html">AddUniteRegionale</a></li>
+                <li>
+                    <a href="AddUniteRegionale.AddUniteRegionale.html"
+                        >AddUniteRegionale</a
+                    >
+                </li>
+                <li><a href="DemandeList.html">DemandeList</a></li>
+                <li><a href="DemandeList.DemandeList.html">DemandeList</a></li>
+                <li><a href="EditDemande.html">EditDemande</a></li>
+                <li><a href="EditDemande.EditDemande.html">EditDemande</a></li>
+                <li><a href="EditDemandFactory.html">EditDemandFactory</a></li>
+                <li><a href="ListReferentiels.html">ListReferentiels</a></li>
+                <li>
+                    <a href="ListReferentiels.ListReferentiels.html"
+                        >ListReferentiels</a
+                    >
+                </li>
+                <li>
+                    <a href="ListUniteRegionale.html">ListUniteRegionale</a>
+                </li>
+                <li>
+                    <a href="ListUniteRegionale.ListUniteRegionale.html"
+                        >ListUniteRegionale</a
+                    >
+                </li>
+                <li><a href="MapBlock.html">MapBlock</a></li>
+                <li><a href="Index.html">Index</a></li>
+                <li><a href="Index.Index.html">Index</a></li>
+                <li><a href="Signup.html">Signup</a></li>
+                <li><a href="Signup.Signup.html">Signup</a></li>
+            </ul>
+            <h3>Global</h3>
+            <ul>
+                <li><a href="global.html#DateExam">DateExam</a></li>
+            </ul>
+        </nav>
+
+        <br class="clear" />
+
+        <footer>
+            Documentation generated by
+            <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.3</a> on Thu Sep
+            19 2019 10:07:37 GMT+0100 (GMT+01:00)
+        </footer>
+
+        <script>
+            prettyPrint()
+        </script>
+        <script src="scripts/linenumber.js"></script>
+    </body>
+</html>

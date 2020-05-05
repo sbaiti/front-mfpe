@@ -1,0 +1,855 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <title>JSDoc: Source: screens/demande/index.jsx</title>
+
+        <script src="scripts/prettify/prettify.js"></script>
+        <script src="scripts/prettify/lang-css.js"></script>
+        <!--[if lt IE 9]>
+            <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+        <![endif]-->
+        <link
+            type="text/css"
+            rel="stylesheet"
+            href="styles/prettify-tomorrow.css"
+        />
+        <link
+            type="text/css"
+            rel="stylesheet"
+            href="styles/jsdoc-default.css"
+        />
+    </head>
+
+    <body>
+        <div id="main">
+            <h1 class="page-title">Source: screens/demande/index.jsx</h1>
+
+            <section>
+                <article>
+                    <pre
+                        class="prettyprint source linenums"
+                    ><code>import React, { Fragment } from 'react'
+import { FormattedMessage, injectIntl } from 'react-intl'
+import PropTypes from 'prop-types'
+import { connect } from 'react-redux'
+import { Paper, Table, TableBody, TableRow, TableCell } from '@material-ui/core'
+import getAllDemandesActions from '../../redux/demande/getAllDemandes'
+import getAllReferenceActions from '../../redux/referencial/getAllReferencial'
+import getAllUsersActions from '../../redux/user/getAllUsers'
+import getAllSpecialitesActions from '../../redux/specialite/getAllSpecialites'
+import { MuiTable } from '../../components/ui/table'
+import generateKey, { calcAge, displayDate } from '../../shared/utility'
+import alertActions from '../../redux/alert'
+import FullWidthTabs from '../../components/demande/fullWidthTabs'
+
+/**
+ * display demands list
+ *
+ * @class DemandeList
+ * @extends {React.Component}
+ */
+class DemandeList extends React.Component {
+    static propTypes = {
+        getAllDemandes: PropTypes.func.isRequired,
+        getAllSpecialites: PropTypes.func.isRequired,
+        allDemandes: PropTypes.array,
+        history: PropTypes.object.isRequired,
+        intl: PropTypes.object.isRequired,
+        language: PropTypes.string.isRequired,
+        loggedUser: PropTypes.object.isRequired,
+        alertShow: PropTypes.func.isRequired,
+        getAllUsers: PropTypes.func.isRequired,
+        allUsers: PropTypes.array,
+        allSpecialites: PropTypes.array,
+        match: PropTypes.object.isRequired,
+        allReferenciels: PropTypes.object,
+    }
+
+    static defaultProps = {
+        allDemandes: [],
+        allUsers: [],
+        allSpecialites: [],
+        allReferenciels: {},
+    }
+
+    /**
+     * Creates an instance of DemandeList.
+     * @param {*} props
+     * @memberof DemandeList
+     */
+    constructor(props) {
+        super(props)
+        this.state = {}
+        const {
+            allDemandes,
+            getAllDemandes,
+            allUsers,
+            getAllUsers,
+            getAllSpecialites,
+            allSpecialites,
+            allReferenciels,
+            intl,
+        } = props
+        if (!allDemandes) getAllDemandes()
+        if (!allUsers) getAllUsers()
+        if (!allSpecialites) getAllSpecialites()
+
+        const allStatus = {}
+        allReferenciels.referenciels.RefStatut.forEach(i => {
+            allStatus[i.id] = intl.formatMessage({ id: i.code })
+        })
+        this.columns = [
+            {
+                field: 'code',
+                title: &lt;FormattedMessage id="number" />,
+            },
+            {
+                field: 'dateDepot',
+                title: &lt;FormattedMessage id="applicationFilingDate" />,
+            },
+            {
+                field: 'specialite',
+                title: &lt;FormattedMessage id="speciality" />,
+            },
+            {
+                field: 'centre',
+                title: &lt;FormattedMessage id="trainingCenter" />,
+            },
+            {
+                field: 'status',
+                title: &lt;FormattedMessage id="status" />,
+                lookup: allStatus,
+            },
+            // {
+            //     field: 'motif',
+            //     title: &lt;FormattedMessage id="motive" />,
+            // },
+            // {
+            //     field: 'dateExam',
+            //     title: &lt;FormattedMessage id="examDate" />,
+            // },
+            // {
+            //     field: 'attestation',
+            //     title: &lt;FormattedMessage id="generatedCertificate" />,
+            // },
+        ]
+    }
+
+    onEdit = id => {
+        const { history, allDemandes } = this.props
+        const demande = (allDemandes || []).find(d => d.id === id)
+        history.push({
+            pathname: `/demande/modifier/${id}`,
+            state: { demande },
+        })
+    }
+
+    onAdd = () => {
+        const { history, loggedUser, language } = this.props
+        if (calcAge(loggedUser.dateNaissance) &lt; 20) {
+            const { alertShow } = this.props
+            alertShow(true, {
+                onConfirm: false,
+                warning: false,
+                info: true,
+                error: true,
+                success: false,
+                message:
+                    language === 'ar'
+                        ? 'لا يمكنك التقديم بطلب, سنك أصغر من 20 سنة'
+                        : 'Vous ne pouvez pas ajouter une demande, votre âge est inférieur à 20 ans',
+                title: language === 'ar' ? 'إشعار' : 'Information',
+            })
+            return
+        }
+        history.push({
+            pathname: `/demande/ajouter/`,
+        })
+    }
+
+    renderDetails = data => {
+        return (
+            &lt;Fragment>
+                &lt;Paper className="p-4 bg-light">
+                    &lt;FullWidthTabs
+                        tabs={[
+                            {
+                                title: &lt;FormattedMessage id="citizenInfos" />,
+                                content: this.renderCitoyenDetails(data),
+                            },
+                            {
+                                title: (
+                                    &lt;FormattedMessage id="applicationInfos" />
+                                ),
+                                content: this.renderDemandeDetails(data),
+                            },
+                            {
+                                title: (
+                                    &lt;FormattedMessage id="applicationHistory" />
+                                ),
+                                content: this.renderApplicationHistory(data),
+                            },
+                            {
+                                title: (
+                                    &lt;FormattedMessage id="citizenApplications" />
+                                ),
+                                content: this.renderCitoyenApplications(data),
+                            },
+                        ]}
+                    />
+                &lt;/Paper>
+            &lt;/Fragment>
+        )
+    }
+
+    renderCitoyenApplications = data => {
+        const { allDemandes, language, intl } = this.props
+        // const lang = language === 'ar' ? 'intituleAr' : 'intituleFr'
+        const demande = (allDemandes || []).find(d => d.id === data.id)
+        const list = (allDemandes || [])
+            .filter(
+                d =>
+                    d.user &amp;&amp;
+                    d.user.id === demande.user.id &amp;&amp;
+                    d.id !== demande.id
+            )
+            .map(d => {
+                return {
+                    code: d.code || d.codedemande,
+                    specialite: d.specialite
+                        ? d.specialite.nomSpecialite
+                        : d.specialiteCitoyen,
+                    status: (
+                        &lt;FormattedMessage
+                            id={
+                                d.currentStatut
+                                    ? d.currentStatut.code
+                                    : 'ATTENTE_DR'
+                            }
+                        />
+                    ),
+                    dateDepot: displayDate(d.createdAt),
+                }
+            })
+        const cols = [
+            { field: 'code', title: &lt;FormattedMessage id="number" /> },
+            {
+                field: 'specialite',
+                title: &lt;FormattedMessage id="speciality" />,
+            },
+            {
+                field: 'dateDepot',
+                title: &lt;FormattedMessage id="applicationFilingDate" />,
+            },
+            { field: 'status', title: &lt;FormattedMessage id="status" /> },
+        ]
+        return (
+            &lt;MuiTable
+                intl={intl}
+                columns={cols}
+                list={list}
+                language={language}
+                exportTable={false}
+            />
+        )
+    }
+
+    /**
+     * displayUserRole
+     *
+     * @memberof DemandeList
+     * @param {string} role
+     * @returns {string} returns role name to display
+     */
+    displayUserRole = role => {
+        switch (role) {
+            case 'ROLE_CITOYEN':
+                return 'Citoyen: '
+            case 'ROLE_CITOYENd':
+                return 'Citoyen: '
+            case 'ROLE_CITOYENq':
+                return 'Citoyen: '
+
+            default:
+                return ''
+        }
+    }
+
+    /**
+     * getActor
+     *
+     * @memberof DemandeList
+     * @param {string} userId
+     * @returns {string} returns user name &amp; role
+     */
+    getActor = userId => {
+        const { allUsers } = this.props
+        const user = (allUsers || []).find(u => u.id === parseInt(userId, 10))
+        return user
+            ? `${this.displayUserRole(user.userRoles[0].role)}${
+                  user.prenomFr
+              } ${user.nomFr}`
+            : ''
+    }
+
+    renderApplicationHistory = data => {
+        const { allDemandes, language, intl } = this.props
+        const demande = (allDemandes || []).find(d => d.id === data.id)
+        // TODO: reform displaying history (grid)
+        const b = [...demande.applicationHistorys]
+        const creation = b.reduce(
+            (max, p) => (p.createdAt > max ? p.createdAt : max),
+            b[0]
+        )
+
+        let list = (demande.applicationHistorys || [])
+            .filter(h => h.id !== creation.id)
+            .map(h => {
+                return {
+                    oper: &lt;FormattedMessage id="changing" />,
+                    actor: this.getActor(h.updatedBy),
+                    status: (
+                        &lt;FormattedMessage id={h.statut ? h.statut.code : '-'} />
+                    ),
+                    date: h.createdAt,
+                }
+            })
+        list = [
+            {
+                oper: &lt;FormattedMessage id="creation" />,
+                actor: this.getActor(demande.createdBy),
+                status: &lt;FormattedMessage id="ATTENTE_DR" />,
+                date: demande.createdAt,
+            },
+            ...list,
+        ]
+        const cols = [
+            { field: 'oper', title: &lt;FormattedMessage id="operation" /> },
+            {
+                field: 'actor',
+                title: &lt;FormattedMessage id="actor" />,
+            },
+            {
+                field: 'date',
+                title: &lt;FormattedMessage id="date" />,
+            },
+            { field: 'status', title: &lt;FormattedMessage id="status" /> },
+        ]
+        return (
+            &lt;MuiTable
+                intl={intl}
+                columns={cols}
+                list={list}
+                language={language}
+                exportTable={false}
+            />
+        )
+    }
+
+    renderDemandeDetails = data => {
+        const { allDemandes, language } = this.props
+        const lang = language === 'ar' ? 'intituleAr' : 'intituleFr'
+        const demande = (allDemandes || []).find(d => d.id === data.id)
+        const details = [
+            {
+                key: &lt;FormattedMessage id="number" />,
+                value: demande.code,
+            },
+            {
+                key: &lt;FormattedMessage id="applicationFilingDate" />,
+                value: displayDate(demande.createdAt),
+            },
+            {
+                key: &lt;FormattedMessage id="speciality" />,
+                value: demande.specialite
+                    ? demande.specialite.nomSpecialite
+                    : demande.specialiteCitoyen,
+            },
+            {
+                key: &lt;FormattedMessage id="status" />,
+                value: &lt;FormattedMessage id={demande.currentStatut.code} />,
+            },
+            {
+                key: &lt;FormattedMessage id="trainingCenter" />,
+                value: demande.centreFormation
+                    ? demande.centreFormation.nom
+                    : 'non défini',
+            },
+            this.isRefused(demande.currentStatut.code) &amp;&amp; {
+                key: &lt;FormattedMessage id="motive" />,
+                value: demande.motif ? demande.motif[lang] : '',
+            },
+            // {
+            //     key: &lt;FormattedMessage id="examDate" />,
+            //     value: demande.attestation || 'non défini',
+            // },
+            {
+                key: &lt;FormattedMessage id="domaine" />,
+                value: demande.domaine[lang],
+            },
+            {
+                key: &lt;FormattedMessage id="sector" />,
+                value: demande.secteur[lang],
+            },
+            {
+                key: &lt;FormattedMessage id="governorate" />,
+                value: demande.gouvernorat[lang],
+            },
+            {
+                key: &lt;FormattedMessage id="delegation" />,
+                value: demande.delegation[lang],
+            },
+            {
+                key: &lt;FormattedMessage id="experienceProof" />,
+                value: demande.justificatifExperience.replace('_', ', '),
+            },
+            {
+                key: &lt;FormattedMessage id="currentAddress" />,
+                value: demande.adresseResidenceActuelle,
+            },
+            demande.attestationFormation &amp;&amp; {
+                key: &lt;FormattedMessage id="companyAddress" />,
+                value: demande.adresseEntreprise,
+            },
+            demande.attestationFormation &amp;&amp; {
+                key: &lt;FormattedMessage id="employer" />,
+                value: demande.nomEmployeur,
+            },
+            demande.projet &amp;&amp; {
+                key: &lt;FormattedMessage id="projectAddress" />,
+                value: demande.adresseProjet,
+            },
+
+            demande.projet &amp;&amp; {
+                key: &lt;FormattedMessage id="projectGovernorate" />,
+                value: demande.gouvernoratProjet[lang],
+            },
+            demande.projet &amp;&amp; {
+                key: &lt;FormattedMessage id="projectDelegation" />,
+                value: demande.delegationProjet[lang],
+            },
+            {
+                key: &lt;FormattedMessage id="regionalDirectorate" />,
+                value: demande.uniteRegionale
+                    ? demande.uniteRegionale.titre
+                    : '',
+            },
+        ]
+        const tableStyle = {
+            boxShadow: ' 0 0 3px 1px #e0e0e0',
+            direction: language === 'ar' ? 'rtl' : 'ltr',
+        }
+        return (
+            &lt;Table style={tableStyle}>
+                &lt;TableBody>
+                    {details.map(
+                        d =>
+                            d &amp;&amp; (
+                                &lt;TableRow key={generateKey()}>
+                                    &lt;TableCell>{d.key}&lt;/TableCell>
+                                    &lt;TableCell>{d.value}&lt;/TableCell>
+                                &lt;/TableRow>
+                            )
+                    )}
+                    &lt;TableRow key={generateKey()}>
+                        &lt;TableCell>
+                            &lt;FormattedMessage id="attachments" />
+                        &lt;/TableCell>
+                        &lt;TableCell>
+                            {demande.documents.map(doc => {
+                                return (
+                                    &lt;a
+                                        className="m-1"
+                                        href={`http://${doc.path}`}
+                                        target="blank"
+                                    >
+                                        {doc.type}
+                                    &lt;/a>
+                                )
+                            })}
+                        &lt;/TableCell>
+                    &lt;/TableRow>
+                &lt;/TableBody>
+            &lt;/Table>
+        )
+    }
+
+    renderCitoyenDetails = data => {
+        const { allDemandes, language } = this.props
+        const lang = language === 'ar' ? 'intituleAr' : 'intituleFr'
+        const demande = (allDemandes || []).find(d => d.id === data.id)
+
+        const tableStyle = {
+            boxShadow: ' 0 0 3px 1px #e0e0e0',
+            direction: language === 'ar' ? 'rtl' : 'ltr',
+        }
+
+        return (
+            &lt;Table style={tableStyle}>
+                &lt;TableBody>
+                    &lt;TableRow>
+                        &lt;TableCell>
+                            &lt;FormattedMessage id="citizen" />
+                        &lt;/TableCell>
+                        &lt;TableCell>
+                            {`${demande.user.prenomFr} ${demande.user.nomFr}`}
+                        &lt;/TableCell>
+                    &lt;/TableRow>
+                    &lt;TableRow>
+                        &lt;TableCell>
+                            &lt;FormattedMessage id="registrationDate" />
+                        &lt;/TableCell>
+                        &lt;TableCell>
+                            {demande.user.inscrDate
+                                ? demande.user.inscrDate
+                                      .split('-')
+                                      .reverse()
+                                      .join('-')
+                                : "date d'inscription invalide"}
+                        &lt;/TableCell>
+                    &lt;/TableRow>
+                    &lt;TableRow>
+                        &lt;TableCell>
+                            &lt;FormattedMessage id="nationality" />
+                        &lt;/TableCell>
+                        &lt;TableCell>
+                            {(demande.user.nationalite || {})[lang]}
+                        &lt;/TableCell>
+                    &lt;/TableRow>
+                    {demande.user.nationalite
+                        ? demande.user.nationalite.intituleFr
+                              .toLowerCase()
+                              .includes('tun')
+                            ? [
+                                  &lt;TableRow key="a">
+                                      &lt;TableCell>
+                                          &lt;FormattedMessage id="cin" />
+                                      &lt;/TableCell>
+                                      &lt;TableCell>
+                                          {demande.user.numCin}
+                                      &lt;/TableCell>
+                                  &lt;/TableRow>,
+                                  &lt;TableRow key="b">
+                                      &lt;TableCell>
+                                          &lt;FormattedMessage id="issueDate" />
+                                      &lt;/TableCell>
+                                      &lt;TableCell>
+                                          {displayDate(
+                                              demande.user.dateDelivranceCin
+                                          )}
+                                      &lt;/TableCell>
+                                  &lt;/TableRow>,
+                              ]
+                            : [
+                                  &lt;TableRow key="a">
+                                      &lt;TableCell>
+                                          &lt;FormattedMessage id="passport" />
+                                      &lt;/TableCell>
+                                      &lt;TableCell>
+                                          {demande.user.numPassport}
+                                      &lt;/TableCell>
+                                  &lt;/TableRow>,
+                                  &lt;TableRow key="b">
+                                      &lt;TableCell>
+                                          &lt;FormattedMessage id="issueDate" />
+                                      &lt;/TableCell>
+                                      &lt;TableCell>
+                                          {displayDate(
+                                              demande.user
+                                                  .dateDelivrancePassport
+                                          )}
+                                      &lt;/TableCell>
+                                  &lt;/TableRow>,
+                                  &lt;TableRow key="c">
+                                      &lt;TableCell>
+                                          &lt;FormattedMessage id="residenceCardNumber" />
+                                      &lt;/TableCell>
+                                      &lt;TableCell>
+                                          {demande.user.numCarteSejour}
+                                      &lt;/TableCell>
+                                  &lt;/TableRow>,
+                                  &lt;TableRow key="d">
+                                      &lt;TableCell>
+                                          &lt;FormattedMessage id="validityStayDate" />
+                                      &lt;/TableCell>
+                                      &lt;TableCell>
+                                          {displayDate(
+                                              demande.user.dateValiditeSejour
+                                          )}
+                                      &lt;/TableCell>
+                                  &lt;/TableRow>,
+                              ]
+                        : null}
+                    &lt;TableRow>
+                        &lt;TableCell>
+                            &lt;FormattedMessage id="birthDate" />
+                        &lt;/TableCell>
+                        &lt;TableCell>
+                            {displayDate(demande.user.dateNaissance)}
+                        &lt;/TableCell>
+                    &lt;/TableRow>
+                    &lt;TableRow>
+                        &lt;TableCell>
+                            &lt;FormattedMessage id="birthPlace" />
+                        &lt;/TableCell>
+                        &lt;TableCell>{demande.user.lieuNaissance}&lt;/TableCell>
+                    &lt;/TableRow>
+                    &lt;TableRow>
+                        &lt;TableCell>
+                            &lt;FormattedMessage id="governorate" />
+                        &lt;/TableCell>
+                        &lt;TableCell>{demande.user.gouvernorat[lang]}&lt;/TableCell>
+                    &lt;/TableRow>
+                    &lt;TableRow>
+                        &lt;TableCell>
+                            &lt;FormattedMessage id="delegation" />
+                        &lt;/TableCell>
+                        &lt;TableCell>{demande.user.delegation[lang]}&lt;/TableCell>
+                    &lt;/TableRow>
+                    &lt;TableRow>
+                        &lt;TableCell>
+                            &lt;FormattedMessage id="phone" />
+                        &lt;/TableCell>
+                        &lt;TableCell>{demande.user.tel}&lt;/TableCell>
+                    &lt;/TableRow>
+                    &lt;TableRow>
+                        &lt;TableCell>
+                            &lt;FormattedMessage id="email" />
+                        &lt;/TableCell>
+                        &lt;TableCell>{demande.user.email}&lt;/TableCell>
+                    &lt;/TableRow>
+                    &lt;TableRow>
+                        &lt;TableCell>
+                            &lt;FormattedMessage id="sex" />
+                        &lt;/TableCell>
+                        &lt;TableCell>{demande.user.sexe}&lt;/TableCell>
+                    &lt;/TableRow>
+                    &lt;TableRow>
+                        &lt;TableCell>
+                            &lt;FormattedMessage id="studyLevel" />
+                        &lt;/TableCell>
+                        &lt;TableCell>
+                            {(demande.user.niveauEtude || {})[lang]}
+                        &lt;/TableCell>
+                    &lt;/TableRow>
+                    &lt;TableRow>
+                        &lt;TableCell>
+                            &lt;FormattedMessage id="personWithSpecialNeeds" />
+                        &lt;/TableCell>
+                        &lt;TableCell>
+                            {demande.user.personneBesoinSpecifique ? (
+                                &lt;FormattedMessage id="yes" />
+                            ) : (
+                                &lt;FormattedMessage id="no" />
+                            )}
+                        &lt;/TableCell>
+                    &lt;/TableRow>
+                    {demande.user.personneBesoinSpecifique &amp;&amp; (
+                        &lt;TableRow key="a">
+                            &lt;TableCell>
+                                &lt;FormattedMessage id="specialNeedsNature" />
+                            &lt;/TableCell>
+                            &lt;TableCell>
+                                {demande.user.natureBesoinSpecifique[lang]}
+                            &lt;/TableCell>
+                        &lt;/TableRow>
+                    )}
+                &lt;/TableBody>
+            &lt;/Table>
+        )
+    }
+
+    /**
+     * isRefused
+     *
+     * @memberof DemandeList
+     * @param {string} status
+     * @returns {boolean} returns true if demande is refused
+     */
+    isRefused = status => {
+        return ['REFUSE_DR', 'REFUS_CENTRE'].indexOf(status) > -1
+    }
+
+    /**
+     * map url params to demands' status'
+     *
+     * @memberof DemandeList
+     * @param {number} urlParam
+     * @returns {array} list of demands' status'
+     */
+    getStatus = urlParam => {
+        switch (urlParam) {
+            case 'nouveau':
+                return ['ATTENTE_DR']
+            case 'en-cours':
+                return [
+                    'SPECIALITE_CHOISIE',
+                    'SCAN_OK',
+                    'CENTRE_OK',
+                    'ATTENTE_PAIEMENT',
+                    'PAIEMENT_OK',
+                    'DATE_EXAM_OK',
+                    'RE_DATE_EXAM_OK',
+                    'PV_UPLOAD',
+                    'PV_ACCEPTE',
+                ]
+            case 'rejetées':
+                return ['REFUSE_DR', 'REFUS_CENTRE', 'PAIEMENT_KO', 'PV_REFUSE']
+            case 'clôturés':
+                return ['ATTESTATION_OK', 'ATTESTATION_KO']
+            default:
+                return ['']
+        }
+    }
+
+    render() {
+        const { allDemandes, intl, language, match } = this.props
+        // const lang = language === 'ar' ? 'intituleAr' : 'intituleFr'
+        const allStatus = this.getStatus(match.params.status)
+        const list = (allDemandes || [])
+            .filter(d =>
+                allStatus.includes(
+                    d.currentStatut.code || d.currentStatut.intituleFr
+                )
+            )
+            .map(d => {
+                return {
+                    id: d.demande_id || d.id,
+                    code: d.code || d.codedemande,
+                    specialite: d.specialite
+                        ? d.specialite.nomSpecialite
+                        : d.specialiteCitoyen,
+                    status: d.currentStatut.id,
+                    dateDepot: displayDate(d.createdAt),
+                    centre: d.centreFormation
+                        ? d.centreFormation.nom
+                        : 'non défini',
+                    // motif: d.motif || 'non défini',
+                    // dateExam: d.dateExam || 'non défini',
+                    // attestation: d.attestation || 'non défini',
+                    noEdit: this.isRefused(d.currentStatut.code),
+                }
+            })
+
+        return (
+            &lt;MuiTable
+                intl={intl}
+                columns={this.columns}
+                list={list}
+                title={&lt;FormattedMessage id="applicationsList" />}
+                edit={e => this.onEdit(e)}
+                language={language}
+                details={e => this.renderDetails(e)}
+                add={e => this.onAdd(e)}
+                // remove={e => this.onRemove(e)}
+            />
+        )
+    }
+}
+
+const mapStateToProps = state => {
+    return {
+        loggedUser: state.login.response.User.details,
+        language: state.info.language,
+        allDemandes: state.demande.allDemandes.response,
+        error: state.demande.allDemandes.error,
+        allReferenciels: state.referencial.allReferencials.response,
+        allUnits: state.uniteRegionale.allUniteRegionales.response,
+        allUsers: state.user.allUsers.response,
+        allSpecialites: state.specialite.allSpecialites.response,
+    }
+}
+const mapDispatchToProps = dispatch => ({
+    getAllDemandes: () =>
+        dispatch(getAllDemandesActions.getAllDemandesRequest()),
+    getAllReferentiels: () =>
+        dispatch(getAllReferenceActions.getAllReferenceRequest()),
+    getAllUsers: () => dispatch(getAllUsersActions.getAllUsersRequest()),
+    getAllSpecialites: () =>
+        dispatch(getAllSpecialitesActions.getAllSpecialitesRequest()),
+    alertShow: (show, info) =>
+        dispatch(
+            alertActions.alertShow(show, {
+                onConfirm: info.onConfirm,
+                warning: info.warning,
+                info: info.info,
+                error: info.error,
+                success: info.success,
+                message: info.message,
+                title: info.title,
+            })
+        ),
+})
+export default connect(
+    mapStateToProps,
+    mapDispatchToProps
+)(injectIntl(DemandeList))
+</code></pre>
+                </article>
+            </section>
+        </div>
+
+        <nav>
+            <h2><a href="index.html">Home</a></h2>
+            <h3>Classes</h3>
+            <ul>
+                <li><a href="AccessForm.html">AccessForm</a></li>
+                <li><a href="AccessForm.AccessForm.html">AccessForm</a></li>
+                <li><a href="AddReferentiel.html">AddReferentiel</a></li>
+                <li>
+                    <a href="AddReferentiel.AddReferentiel.html"
+                        >AddReferentiel</a
+                    >
+                </li>
+                <li><a href="AddUniteRegionale.html">AddUniteRegionale</a></li>
+                <li>
+                    <a href="AddUniteRegionale.AddUniteRegionale.html"
+                        >AddUniteRegionale</a
+                    >
+                </li>
+                <li><a href="DemandeList.html">DemandeList</a></li>
+                <li><a href="DemandeList.DemandeList.html">DemandeList</a></li>
+                <li><a href="EditDemande.html">EditDemande</a></li>
+                <li><a href="EditDemande.EditDemande.html">EditDemande</a></li>
+                <li><a href="EditDemandFactory.html">EditDemandFactory</a></li>
+                <li><a href="ListReferentiels.html">ListReferentiels</a></li>
+                <li>
+                    <a href="ListReferentiels.ListReferentiels.html"
+                        >ListReferentiels</a
+                    >
+                </li>
+                <li>
+                    <a href="ListUniteRegionale.html">ListUniteRegionale</a>
+                </li>
+                <li>
+                    <a href="ListUniteRegionale.ListUniteRegionale.html"
+                        >ListUniteRegionale</a
+                    >
+                </li>
+                <li><a href="MapBlock.html">MapBlock</a></li>
+                <li><a href="Index.html">Index</a></li>
+                <li><a href="Index.Index.html">Index</a></li>
+                <li><a href="Signup.html">Signup</a></li>
+                <li><a href="Signup.Signup.html">Signup</a></li>
+            </ul>
+            <h3>Global</h3>
+            <ul>
+                <li><a href="global.html#DateExam">DateExam</a></li>
+            </ul>
+        </nav>
+
+        <br class="clear" />
+
+        <footer>
+            Documentation generated by
+            <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.3</a> on Thu Sep
+            19 2019 10:07:37 GMT+0100 (GMT+01:00)
+        </footer>
+
+        <script>
+            prettyPrint()
+        </script>
+        <script src="scripts/linenumber.js"></script>
+    </body>
+</html>

@@ -1,0 +1,63 @@
+pipeline {
+    agent {
+        docker {
+            image 'node:8.16.0-jessie'
+            args '-p 3020:3000 -u root'
+        }
+    }
+    environment {
+        CI = 'false'
+        server_pass = credentials('FRONTINM_password')
+    }
+    stages {
+        stage('setup') {
+            steps {
+                // sh 'rm -rf node_modules/ '
+                sh 'npm install '
+                  }
+            }
+    
+        stage('Lint Test') {
+                steps {
+                    sh ' npm run lint '
+                }
+                        
+        }
+        stage('Build') {
+                steps {
+                    sh ' npm run build '
+                }
+                        
+        }
+        
+        stage('Deploy ssh Cynapsys'){
+            steps {
+        
+                script {
+                    withCredentials([string(credentialsId: 'FRONTINM_password', variable: 'FRONTINM_password')]) {
+                    def remote = [:]
+                    remote.name = 'devhost'
+                    remote.host = '10.1.1.50'
+                    remote.user = 'root'
+                    remote.password = FRONTINM_password
+                    remote.allowAnyHosts = true
+                    stage('Remote SSH') {
+                        sshCommand remote: remote, command: " rm -rf /var/www/html/FrontMFPEExterne/build "
+                        sshPut remote: remote, from: '/var/lib/jenkins/workspace/FrontMFPEPreprod/build', into: '/var/www/html/FrontMFPEExterne'            }
+                }
+            }}}
+        
+
+        
+        
+        stage('notifications'){
+        steps {
+            mail bcc: 'MFPE release ', body: '''
+            
+            Le déploiement de MFPE preprod est terminé avec succès  . \n Lien interne : http://10.1.1.50:49 \n  Lien externe :  http://41.226.165.26:8216/ \n  
+            ''', cc: 'safouane.fatin@gfi-tunisie.com , ibrahim.haouari@gfi-tunisie.com,abdeladel.majdeb@gfi-tunisie.com , fatma.hbal@gfi-tunisie.com', from: 'jenkins@gfi-tunisie.com', replyTo: '', subject: 'MFPE release ', to: 'houssem.khaldi@gfi-tunisie.com'
+        
+            }
+                }
+    }
+}

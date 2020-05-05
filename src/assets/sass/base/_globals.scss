@@ -1,0 +1,625 @@
+//colors
+$color_tangaroa_approx: #081939;
+$white: white;
+$color_viking_approx: #61c5e5;
+$black_53: rgba(0, 0, 0, 0.53);
+$black_12: rgba(0, 0, 0, 0.12);
+$color_asphalt_approx: #170312;
+$color_valencia_approx: rgb(213, 69, 64);
+
+.App {
+    min-height: 80vh;
+    display: flex;
+    flex-direction: row;
+}
+
+body {
+    background-color: $gray-200;
+}
+
+.uppercase {
+    text-transform: uppercase;
+}
+
+.capitalize {
+    text-transform: capitalize;
+}
+
+.m-0 {
+    margin: 0;
+}
+
+.m-auto {
+    margin: auto;
+}
+
+.mt-auto {
+    margin: auto 0;
+}
+
+.MuiListItem-root {
+    text-align: unset !important;
+}
+
+.header {
+    flex-shrink: 0;
+    padding: 5px 31px;
+    background-color: $color_tangaroa_approx;
+
+    .MuiSelect-icon {
+        color: white;
+    }
+
+    .left-block {
+        color: $white;
+        display: flex;
+
+        .text-block {
+            margin: auto 0;
+            padding: 0 5px;
+            display: block;
+            width: 216px;
+
+            p {
+                margin: 0;
+                font-size: 10px;
+
+                &:nth-child(2) {
+                    line-height: 1;
+                }
+            }
+        }
+
+        .tn-flag img {
+            width: 70px;
+        }
+    }
+
+    .right-block {
+        position: relative;
+        display: flex;
+        justify-content: flex-end;
+        text-align: center;
+
+        .prof-access {
+            position: relative;
+            margin: auto 30px;
+            color: $white;
+            cursor: pointer;
+
+            img {
+                height: 25px;
+            }
+
+            &:hover {
+                color: $color_viking_approx;
+            }
+
+            p {
+                margin: 0;
+                width: 75px;
+                font-weight: bold;
+                font-size: 9px;
+            }
+        }
+
+        .select-lang {
+            margin: auto;
+            color: $color_viking_approx;
+            border: 0;
+
+            svg {
+                color: $color_viking_approx;
+            }
+        }
+
+        .access-form-block {
+            padding: 20px 0;
+            width: 245px;
+            position: absolute;
+            top: 106%;
+            background-color: $white;
+            //Instead of the line below you could use @include box-shadow($shadow-1, $shadow-2, $shadow-3, $shadow-4, $shadow-5, $shadow-6, $shadow-7, $shadow-8, $shadow-9, $shadow-10)
+            box-shadow: 0 15px 20px 1px $black_53;
+            z-index: 99;
+
+            .submit-button {
+                margin: 12px auto 0;
+            }
+        }
+    }
+
+    .center-block .logo-img {
+        text-align: center;
+
+        img {
+            height: 85px;
+            cursor: pointer;
+        }
+    }
+}
+
+.sidebar {
+    position: relative !important;
+    overflow-x: hidden;
+    border-right: 1px solid $black_12;
+    background-color: $white;
+
+    .list-item {
+        border-color: $color_viking_approx;
+    }
+
+    hr {
+        background-color: $gray-200;
+    }
+}
+
+.dashboard-main {
+    flex: 1;
+    flex-wrap: nowrap;
+
+    .dashboard-header {
+        padding: 5px 5%;
+        display: flex;
+        background-color: $gray-200;
+
+        .left-block {
+            flex: auto;
+
+            .pageTitle h1 {
+                margin: auto;
+                width: max-content;
+                min-width: 250px;
+            }
+        }
+
+        .right-block {
+            display: flex;
+        }
+
+        .profile-status {
+            position: relative;
+            margin: auto 30px;
+            text-align: center;
+            min-width: 130px;
+            cursor: pointer;
+
+            .disconnectButton {
+                position: absolute;
+                bottom: 0;
+                left: 0;
+                width: max-content;
+                min-width: 100%;
+                white-space: nowrap;
+                cursor: pointer;
+                z-index: 1;
+            }
+        }
+
+        .notifications {
+            margin: auto;
+            cursor: pointer;
+        }
+    }
+}
+
+.pos-relative {
+    position: relative;
+}
+
+.notifications-list {
+    width: min-content;
+    position: absolute;
+    z-index: 99999;
+    top: 60px;
+
+    // * {
+    //     margin: 2px 0 !important;
+    // }
+}
+
+.containerAr {
+    direction: rtl;
+    text-align: right;
+
+    .notifications-list {
+        left: 0;
+    }
+
+    .MuiTab-root {
+        &.Mui-selected {
+            &:first-child {
+                background-image: linear-gradient(
+                    to right,
+                    #49a0ae,
+                    #265870 20% 100%,
+                    #49a0ae
+                );
+            }
+
+            &:last-child {
+                background-image: linear-gradient(
+                    to right,
+                    #49a0ae,
+                    #265870 0% 80%,
+                    #49a0ae
+                );
+            }
+
+            &:last-child:first-child {
+                background-image: linear-gradient(
+                    to right,
+                    #49a0ae,
+                    #265870 0% 100%,
+                    #49a0ae
+                );
+            }
+        }
+    }
+
+    .access-form-block {
+        left: 0;
+    }
+
+    svg.MuiSvgIcon-root.MuiSelect-icon.MuiSelect-iconOutlined {
+        left: 7px;
+        right: auto;
+    }
+}
+
+.containerFr {
+    direction: ltr;
+    text-align: left;
+
+    .notifications-list {
+        right: 0;
+    }
+
+    .MuiTab-root {
+        &.Mui-selected {
+            &:first-child {
+                background-image: linear-gradient(
+                    to left,
+                    #49a0ae,
+                    #265870 20% 100%,
+                    #49a0ae
+                );
+            }
+
+            &:last-child {
+                background-image: linear-gradient(
+                    to left,
+                    #49a0ae,
+                    #265870 0% 80%,
+                    #49a0ae
+                );
+            }
+
+            &:last-child:first-child {
+                background-image: linear-gradient(
+                    to right,
+                    #49a0ae,
+                    #265870 0% 100%,
+                    #49a0ae
+                );
+            }
+        }
+    }
+
+    .access-form-block {
+        right: 0;
+    }
+}
+
+.dashboard-page {
+    flex: 1 1 auto;
+    background-color: $white;
+}
+
+.footer {
+    flex-shrink: 0;
+    background-color: $color_tangaroa_approx;
+}
+
+.cernterDiv {
+    text-align: center;
+}
+
+.gridItem {
+    padding: 0 5% !important;
+}
+
+@media screen and(max-width: 540px) {
+    .header {
+        padding: 0;
+
+        .left-block .text-block {
+            padding-left: 5px;
+
+            p {
+                font-size: 11px;
+            }
+        }
+    }
+}
+
+@media screen and(max-width: 960px) {
+    .gridItem {
+        padding: 0 !important;
+    }
+
+    .header {
+        .left-block {
+            .text-block {
+                width: 60%;
+            }
+
+            .tn-flag img {
+                height: 40px;
+                width: 55px;
+            }
+        }
+
+        .right-block {
+            margin: 10px;
+            flex-direction: row-reverse;
+            justify-content: space-between;
+
+            .prof-access {
+                margin: 0;
+
+                p {
+                    font-size: 10px;
+                }
+            }
+        }
+
+        .center-block .logo-img img {
+            height: 65px;
+            width: 95px;
+        }
+    }
+
+    div.centerDiv {
+        width: 100% !important;
+    }
+
+    .containerFr .header .center-block .logo-img {
+        float: right;
+    }
+
+    .containerAr .header .center-block .logo-img {
+        float: left;
+    }
+
+    .dashboard-main .dashboard-header {
+        display: block;
+
+        .right-block {
+            flex-direction: row;
+            justify-content: flex-end;
+        }
+
+        .notifications {
+            margin: auto 0;
+        }
+
+        .left-block .pageTitle h1 {
+            width: 100%;
+        }
+
+        .profile-status .disconnectButton {
+            bottom: 0;
+        }
+    }
+}
+
+@media screen and(min-width: 960px) {
+    .header .right-block .prof-access {
+        top: 25%;
+    }
+
+    .dashboard-main .dashboard-header .left-block .pageTitle h1 {
+        min-width: 50%;
+    }
+}
+
+.spinner {
+    width: 60px;
+    height: 60px;
+    left: 48%;
+    top: 30%;
+    background-color: transparent;
+    position: absolute;
+    text-align: center;
+    animation: sk-rotate 2s infinite linear;
+    z-index: 10000;
+}
+
+.dot1 {
+    width: 60%;
+    height: 60%;
+    display: inline-block;
+    position: absolute;
+    top: 0;
+    background-color: $primary;
+    //Instead of the line below you could use @include border-radius($radius, $vertical-radius)
+    border-radius: 100%;
+    animation: sk-bounce 2s infinite ease-in-out;
+}
+
+.dot2 {
+    width: 60%;
+    height: 60%;
+    display: inline-block;
+    position: absolute;
+    top: 0;
+    background-color: $secondary;
+    //Instead of the line below you could use @include border-radius($radius, $vertical-radius)
+    border-radius: 100%;
+    animation: sk-bounce 2s infinite ease-in-out;
+    top: auto;
+    bottom: 0;
+    animation-delay: -1s;
+}
+
+@-webkit-keyframes sk-rotate {
+    100% {
+    }
+}
+
+@keyframes sk-rotate {
+    100% {
+        //Instead of the line below you could use @include transform($scale, $rotate, $transx, $transy, $skewx, $skewy, $originx, $originy)
+        transform: rotate(360deg);
+    }
+}
+
+@-webkit-keyframes sk-bounce {
+    0% {
+    }
+
+    100% {
+    }
+
+    50% {
+    }
+}
+
+@keyframes sk-bounce {
+    0% {
+        //Instead of the line below you could use @include transform($scale, $rotate, $transx, $transy, $skewx, $skewy, $originx, $originy)
+        transform: scale(0);
+    }
+
+    100% {
+        //Instead of the line below you could use @include transform($scale, $rotate, $transx, $transy, $skewx, $skewy, $originx, $originy)
+        transform: scale(0);
+    }
+
+    50% {
+        //Instead of the line below you could use @include transform($scale, $rotate, $transx, $transy, $skewx, $skewy, $originx, $originy)
+        transform: scale(1);
+    }
+}
+
+.closeBtnAlert {
+    width: 30px !important;
+    height: 30px !important;
+    background: $color_valencia_approx !important;
+    top: 0 !important;
+    right: 0 !important;
+    //Instead of the line below you could use @include border-radius($radius, $vertical-radius)
+    border-radius: 0 !important;
+    color: $white !important;
+    font-weight: bold !important;
+    border: none !important;
+    position: absolute !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    line-height: 1;
+}
+
+.ConfirmBtnAlert {
+    padding: 0.4rem 2rem;
+    font-size: 1.4375rem;
+    line-height: 1.5;
+    border-radius: 0.3rem;
+}
+
+.MuiInput-underline {
+    &:after {
+        border: none !important;
+    }
+
+    &:before {
+        border: none !important;
+    }
+}
+
+div.centerDiv {
+    width: 90%;
+    margin: auto;
+}
+
+label + .MuiInput-formControl {
+    margin-top: 9px !important;
+    //box-shadow: none !important;
+}
+
+div.gradiant {
+    padding: 30px;
+    background-image: radial-gradient(#e6e6e6, transparent);
+}
+
+div.signupImage {
+    display: inline-block;
+    background-image: url('http://10.1.1.50:49/static/media/inscription.48ca15b8.svg');
+    background-size: 150%;
+    width: 100%;
+    background-repeat: no-repeat;
+    background-position: 50% center;
+}
+
+.bg-gray-300 {
+    background-color: $gray-300 !important;
+}
+
+.deleg-delimiter {
+    fill: #1b769e;
+    stroke: #ffffff;
+    stroke-miterlimit: 10;
+}
+
+.fill-white {
+    fill: #ffffff;
+}
+
+.fill-blue {
+    fill: #1b769e;
+}
+
+.fill-none {
+    fill: none;
+}
+
+.svg-arrow {
+    fill: none;
+    stroke: #1a171b;
+}
+
+.svg-font-23 {
+    font-size: 23px;
+}
+
+.svg-marsh {
+    fill: #61c5e5;
+    stroke: #ffffff;
+    stroke-miterlimit: 10;
+}
+
+.fill-purple {
+    fill-rule: evenodd;
+    clip-rule: evenodd;
+    fill: #762b88;
+}
+
+.fill-pink {
+    fill: #ec018c;
+}
+
+.fill-yellow {
+    fill: #ffb301;
+}
+
+.fill-green {
+    fill: #8dc640;
+}
+
+.fill-dark-blue {
+    fill: #01838f;
+}
+
+.fill-light-blue {
+    fill: #61c5e5;
+}

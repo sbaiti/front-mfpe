@@ -1,0 +1,29 @@
+[
+    {
+        "governorate": "Tunis",
+        "NumberOfHealthEstablishments": "120",
+        "NumberOfEducationalEstablishments": "180",
+        "NumberOfDropouts": "96200",
+        "NumberOfUniversityEstablishments": "30",
+        "NumberOfNeedyFamilies": "5270",
+        "NumberOfAssociations": "3200"
+    },
+    {
+        "governorate": "Nabeul",
+        "NumberOfHealthEstablishments": "80",
+        "NumberOfEducationalEstablishments": "120",
+        "NumberOfDropouts": "6200",
+        "NumberOfUniversityEstablishments": "20",
+        "NumberOfNeedyFamilies": "3700",
+        "NumberOfAssociations": "1700"
+    },
+    {
+        "governorate": "Ariana",
+        "NumberOfHealthEstablishments": "100",
+        "NumberOfEducationalEstablishments": "70",
+        "NumberOfDropouts": "1200",
+        "NumberOfUniversityEstablishments": "40",
+        "NumberOfNeedyFamilies": "3000",
+        "NumberOfAssociations": "1200"
+    }
+]

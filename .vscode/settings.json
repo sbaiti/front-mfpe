@@ -1,0 +1,12 @@
+{
+    "eslint.autoFixOnSave": true,
+    "files.associations": {
+        "*.js": "javascriptreact"
+    },
+    "editor.formatOnSave": true,
+    "javascript.suggest.completeFunctionCalls": true,
+    "typescript.format.insertSpaceBeforeFunctionParenthesis": true,
+    "typescript.format.placeOpenBraceOnNewLineForControlBlocks": true,
+    "typescript.format.placeOpenBraceOnNewLineForFunctions": true,
+    "vscodeGoogleTranslate.preferredLanguage": "false"
+}

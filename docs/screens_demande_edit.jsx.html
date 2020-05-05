@@ -1,0 +1,795 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <title>JSDoc: Source: screens/demande/edit.jsx</title>
+
+        <script src="scripts/prettify/prettify.js"></script>
+        <script src="scripts/prettify/lang-css.js"></script>
+        <!--[if lt IE 9]>
+            <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+        <![endif]-->
+        <link
+            type="text/css"
+            rel="stylesheet"
+            href="styles/prettify-tomorrow.css"
+        />
+        <link
+            type="text/css"
+            rel="stylesheet"
+            href="styles/jsdoc-default.css"
+        />
+    </head>
+
+    <body>
+        <div id="main">
+            <h1 class="page-title">Source: screens/demande/edit.jsx</h1>
+
+            <section>
+                <article>
+                    <pre
+                        class="prettyprint source linenums"
+                    ><code>/* eslint-disable react/forbid-prop-types */
+
+import React from 'react'
+import FormGroup from '@material-ui/core/FormGroup'
+import { Grid, Paper } from '@material-ui/core'
+import { FormattedMessage, injectIntl } from 'react-intl'
+import PropTypes from 'prop-types'
+import { connect } from 'react-redux'
+import addDays from 'date-fns/addDays'
+import { formatDate } from '../../shared/utility'
+import Details from '../../components/demande/details'
+import ButtonComponent from '../../components/ui/button'
+import editDemandeActions from '../../redux/demande/editDemande'
+import getAllCentersActions from '../../redux/centreFormation/getAllCenters'
+import alertActions from '../../redux/alert'
+import EditDemandFactory from '../../components/demande/EditDemandFactory'
+import getAllSpecialitesActions from '../../redux/specialite/getAllSpecialites'
+import getAllUsersActions from '../../redux/user/getAllUsers'
+
+/**
+ * traiter la demande du citoyen selon le statut
+ *
+ * @class EditDemande
+ * @extends {React.Component}
+ */
+class EditDemande extends React.Component {
+    /**
+     * PropTypes
+     *
+     * @static
+     * @memberof EditDemande
+     */
+    static propTypes = {
+        intl: PropTypes.object.isRequired,
+        language: PropTypes.string.isRequired,
+        editDemande: PropTypes.func.isRequired,
+        response: PropTypes.object,
+        error: PropTypes.bool,
+        history: PropTypes.object.isRequired,
+        allReferentiels: PropTypes.object,
+        alertShow: PropTypes.func.isRequired,
+        getAllCenters: PropTypes.func.isRequired,
+        loggedUser: PropTypes.object.isRequired,
+        getAllSpecialites: PropTypes.func.isRequired,
+        allSpecialites: PropTypes.array,
+        allCenters: PropTypes.array,
+        resetProps: PropTypes.func.isRequired,
+        getAllUsers: PropTypes.func.isRequired,
+        allUsers: PropTypes.array.isRequired,
+    }
+
+    /**
+     * Default Pros
+     *
+     * @static
+     * @memberof EditDemande
+     */
+    static defaultProps = {
+        allReferentiels: {},
+        allCenters: [],
+        response: null,
+        error: false,
+        allSpecialites: [],
+    }
+
+    /**
+     *Creates an instance of EditDemande.
+     * @param {*} props
+     * @memberof EditDemande
+     */
+    constructor(props) {
+        super(props)
+        this.state = {
+            isError: false,
+            errorsList: {},
+            file: null,
+        }
+        this.status = '1'
+        this.motif = ''
+        this.demande = {}
+        const {
+            history,
+            getAllCenters,
+            getAllSpecialites,
+            allUsers,
+            getAllUsers,
+        } = this.props
+
+        try {
+            this.demande = {
+                ...props.history.location.state.demande,
+                specialite: props.history.location.state.demande.specialite || {
+                    id: '',
+                },
+                centre_formation: props.history.location.state.demande
+                    .centreFormation || { id: '' },
+            }
+            if (
+                this.demande.currentStatut.code === 'SPECIALITE_CHOISIE' ||
+                this.demande.currentStatut.code === 'CENTRE_OK'
+            ) {
+                getAllCenters()
+            }
+            if (this.demande.currentStatut.code === 'ATTENTE_DR') {
+                getAllSpecialites()
+            }
+            if (!allUsers) getAllUsers()
+        } catch (error) {
+            history.push({
+                pathname: `/demande/liste`,
+            })
+        }
+    }
+
+    /**
+     * componentWillReceiveProps
+     *
+     * @param {*} nextProps
+     * @memberof EditDemande
+     */
+    componentWillReceiveProps(nextProps) {
+        const { language, history, response } = this.props
+        if (nextProps.error &amp;&amp; nextProps.response) {
+            const errorsList = {}
+            try {
+                Object.keys(nextProps.response.data.data).forEach(key => {
+                    const item = nextProps.response.data.data[key]
+                    const errorText = item[language]
+                    errorsList[key] = errorText
+                })
+            } catch (e) {
+                console.error(e)
+            }
+            this.setState({
+                isError: true,
+                errorsList,
+            })
+        }
+        if (nextProps.error === false &amp;&amp; nextProps.response !== response) {
+            history.goBack()
+        }
+    }
+
+    /**
+     * fieldChangedHandler
+     *
+     * @param{*} e - event
+     * @param{string} name
+     * @memberof EditDemande
+     */
+    fieldChangedHandler = (e, name) => {
+        this.demande[name] = e.target.value
+    }
+
+    /**
+     * Update
+     * @param{string} key
+     * @memberof EditDemande
+     */
+    update = key => {
+        if (['domaine', 'secteur'].indexOf(key) > -1) this.forceUpdate()
+        switch (key) {
+            case 'domaine':
+                this.demande.secteur = ''
+                this.demande.specialite = ''
+                break
+            case 'secteur':
+                this.demande.specialite = ''
+                break
+            default:
+                break
+        }
+    }
+
+    getResponse = currentStatut => {
+        switch (currentStatut) {
+            case 'ATTENTE_DR':
+                if (this.status === '1') {
+                    return {
+                        id: this.demande.id,
+                        domaine: { id: this.demande.domaine.id },
+                        secteur: { id: this.demande.secteur.id },
+                        specialite: this.demande.specialite || '',
+                        statut: 'SPECIALITE_CHOISIE',
+                        action: this.status,
+                        preview: 'true',
+                    }
+                }
+                return {
+                    id: this.demande.id,
+                    statut: 'REFUSE_DR',
+                    motif: this.motif,
+                    action: this.status,
+                }
+            default:
+                return {}
+        }
+    }
+
+    /**
+     * Edit Demande - payload update
+     *
+     * @memberof EditDemande
+     */
+    editDemande = () => {
+        let payload = {}
+        const { file } = this.state
+        const { language, alertShow } = this.props
+        const url = `demande/${this.demande.id}`
+        const method = 'PATCH'
+        if (file &amp;&amp; file.size / 1048576 > 2) {
+            const msg =
+                language === 'ar'
+                    ? 'يجب أن يكون حجم الملف أقل من 2 ميغابايت'
+                    : 'La taille du fichier doit être inférieure à 2 Mo'
+            alertShow(true, {
+                onConfirm: false,
+                warning: false,
+                info: true,
+                error: true,
+                success: false,
+                message: msg,
+                title: language === 'ar' ? 'إشعار' : 'Information',
+            })
+            return
+        }
+        switch (this.demande.currentStatut.code) {
+            case 'ATTENTE_DR':
+                payload = {
+                    method,
+                    url,
+                    response: this.getResponse('ATTENTE_DR'),
+                }
+                break
+            case 'SPECIALITE_CHOISIE':
+                payload = {
+                    method,
+                    url,
+                    response: {
+                        centre_formation: this.demande.centre_formation,
+                        statut: 'CENTRE_OK',
+                        action: this.status,
+                    },
+                }
+                if (
+                    this.demande.centre_formation.id &amp;&amp;
+                    this.demande['file[]']
+                ) {
+                    payload = {
+                        ...payload,
+                        url2: `document/upload/${this.demande.id}`,
+                        response2: {
+                            'file[]': this.demande['file[]'] || {},
+                            file: this.demande.file,
+                        },
+                    }
+                }
+                break
+            case 'CENTRE_OK':
+                payload = {
+                    method: 'POST',
+                    url: `document/upload/${this.demande.id}`,
+                    response: {
+                        'file[]': this.demande['file[]'] || {},
+                        file: this.demande.file,
+                    },
+                }
+                break
+            case 'SCAN_OK':
+                payload = {
+                    method,
+                    url,
+                    response:
+                        this.status === '0'
+                            ? {
+                                  statut: 'REFUS_CENTRE',
+                                  motif: this.motif || { id: '' },
+                                  action: '0',
+                              }
+                            : { statut: 'ATTENTE_PAIEMENT', action: '1' },
+                }
+                break
+            case 'ATTENTE_PAIEMENT':
+                payload = {
+                    method,
+                    url,
+                    response: { action: '1', statut: 'PAIEMENT_OK' },
+                }
+                break
+            case 'PAIEMENT_OK':
+                payload = {
+                    method: 'PATCH',
+                    url,
+                    response: {
+                        date_exam: this.demande.date_exam,
+                        action: '1',
+                        statut: this.demande.nextStatus
+                            ? 'RE_DATE_EXAM_OK'
+                            : 'DATE_EXAM_OK',
+                    },
+                }
+                break
+            case 'DATE_EXAM_OK':
+                if (this.demande.nextStatus) {
+                    payload = {
+                        method: 'PATCH',
+                        url,
+                        response: {
+                            date_exam: this.demande.date_exam,
+                            action: '1',
+                            statut: this.demande.nextStatus
+                                ? 'RE_DATE_EXAM_OK'
+                                : 'DATE_EXAM_OK',
+                        },
+                    }
+                } else {
+                    payload = {
+                        method: 'POST',
+                        url: `document/upload-pv/${this.demande.id}`,
+                        response: { file: this.demande.file },
+                    }
+                }
+                break
+            case 'RE_DATE_EXAM_OK':
+                if (this.demande.nextStatus) {
+                    payload = {
+                        method: 'PATCH',
+                        url,
+                        response: {
+                            date_exam: this.demande.date_exam,
+                            action: '1',
+                            statut: 'RE_DATE_EXAM_OK',
+                        },
+                    }
+                } else {
+                    payload = {
+                        method: 'POST',
+                        url: `document/upload-pv/${this.demande.id}`,
+                        response: { file: this.demande.file },
+                    }
+                }
+                break
+            case 'PV_UPLOAD':
+                payload = {
+                    method,
+                    url,
+                    response:
+                        this.status === '0'
+                            ? {
+                                  statut: 'PV_REFUSE',
+                                  action: this.status,
+                                  motif: this.motif || { id: '' },
+                              }
+                            : {
+                                  action: this.status,
+                                  statut: 'PV_ACCEPTE',
+                              },
+                }
+                break
+
+            default:
+                break
+        }
+        const { editDemande } = this.props
+        editDemande(payload)
+    }
+
+    /**
+     * Go Back
+     *
+     * @memberof EditDemande
+     */
+    goBack = () => {
+        const { resetProps } = this.props
+        resetProps()
+    }
+
+    /**
+     * Render Details
+     *
+     * @memberof EditDemande
+     */
+    renderDetails = () => {
+        const { language, history } = this.props
+
+        const lang = language === 'ar' ? 'intituleAr' : 'intituleFr'
+        return (
+            &lt;Details
+                demande={(history.location.state || {}).demande || this.demande}
+                lang={lang}
+                language={language}
+            />
+        )
+    }
+
+    /**
+     * Display Action
+     *
+     * @memberof EditDemande
+     */
+    displayAction = () => {
+        const { errorsList, isError } = this.state
+        const {
+            language,
+            intl,
+            loggedUser,
+            allReferentiels,
+            allSpecialites,
+            allCenters,
+            allUsers,
+        } = this.props
+        const factoryProps = {
+            demande: this.demande,
+            language,
+            fieldChangedHandler: this.fieldChangedHandler,
+            errorsList,
+            isError,
+            intl,
+            loggedUser,
+            allReferentiels,
+            status: this.status,
+            motif: this.motif,
+            update: this.update,
+            allSpecialites: this.allSpecialites,
+            forceUpdate: () => this.forceUpdate(),
+            allUsers,
+        }
+        switch (this.demande.currentStatut.code) {
+            case 'ATTENTE_DR':
+                return (
+                    &lt;EditDemandFactory
+                        data={{
+                            action: 'ATTENTE_DR',
+                            props: {
+                                ...factoryProps,
+                                allSpecialites,
+                                fieldChangedHandler: (e, name) => {
+                                    if (name === 'status' || name === 'motif')
+                                        this[name] = e.target.value
+                                    else this.fieldChangedHandler(e, name)
+                                },
+                            },
+                        }}
+                        update={this.handleUpdate}
+                    />
+                )
+            case 'SPECIALITE_CHOISIE':
+                return (
+                    &lt;EditDemandFactory
+                        data={{
+                            action: 'SPECIALITE_CHOISIE',
+                            props: { ...factoryProps, allCenters },
+                        }}
+                        update={this.handleUpdate}
+                    />
+                )
+            case 'CENTRE_OK':
+                return (
+                    &lt;EditDemandFactory
+                        data={{
+                            action: 'CENTRE_OK',
+                            props: { ...factoryProps, allCenters },
+                        }}
+                        update={this.handleUpdate}
+                    />
+                )
+            case 'SCAN_OK':
+                return (
+                    &lt;EditDemandFactory
+                        data={{
+                            action: 'SCAN_OK',
+                            props: {
+                                ...factoryProps,
+                                fieldChangedHandler: (e, name) => {
+                                    this[name] = e.target.value
+                                },
+                            },
+                        }}
+                    />
+                )
+            case 'ATTENTE_PAIEMENT':
+                return (
+                    &lt;EditDemandFactory
+                        data={{
+                            action: 'ATTENTE_PAIEMENT',
+                            props: {
+                                ...factoryProps,
+                                fieldChangedHandler: (e, name) => {
+                                    this[name] = e.target.value
+                                },
+                            },
+                        }}
+                    />
+                )
+            case 'PAIEMENT_OK':
+                this.demande.date_exam = formatDate(
+                    Date(this.demande.date_exam) >= addDays(new Date(), 10)
+                        ? Date(this.demande.date_exam)
+                        : addDays(new Date(), 10)
+                )
+                return (
+                    &lt;EditDemandFactory
+                        data={{
+                            action: 'PAIEMENT_OK',
+                            props: factoryProps,
+                        }}
+                    />
+                )
+
+            case 'DATE_EXAM_OK':
+                return (
+                    &lt;EditDemandFactory
+                        data={{
+                            action: 'DATE_EXAM_OK',
+                            props: {
+                                isError,
+                                errorsList,
+                                factoryProps,
+                            },
+                        }}
+                        update={this.handleUpdate}
+                    />
+                )
+            case 'RE_DATE_EXAM_OK':
+                return (
+                    &lt;EditDemandFactory
+                        data={{
+                            action: 'RE_DATE_EXAM_OK',
+                            props: {
+                                isError,
+                                errorsList,
+                                factoryProps,
+                            },
+                        }}
+                        update={this.handleUpdate}
+                    />
+                )
+            case 'PV_UPLOAD':
+                return (
+                    &lt;EditDemandFactory
+                        data={{
+                            action: 'PV_UPLOAD',
+                            props: {
+                                ...factoryProps,
+                                fieldChangedHandler: (e, name) => {
+                                    this[name] = e.target.value
+                                },
+                                files: this.demande.documents || [],
+                                resultat: this.resultat,
+                            },
+                        }}
+                    />
+                )
+
+            default:
+                return &lt;p>CETTE PAGE EST EN COURS DE CONSTRUCTION&lt;/p>
+        }
+    }
+
+    /**
+     * Handle Update State
+     *
+     * @param {string} action - Action Name
+     * @param {object} data - data to be update in the state
+     * @memberof EditDemande
+     */
+    handleUpdate = (action, data, file) => {
+        const { alertShow, language } = this.props
+        this.setState({ file })
+        if (file &amp;&amp; file.size / 1048576 > 2) {
+            const msg =
+                language === 'ar'
+                    ? 'يجب أن يكون حجم الملف أقل من 2 ميغابايت'
+                    : 'La taille du fichier doit être inférieure à 2 Mo'
+            alertShow(true, {
+                onConfirm: false,
+                warning: false,
+                info: true,
+                error: true,
+                success: false,
+                message: msg,
+                title: language === 'ar' ? 'إشعار' : 'Information',
+            })
+            return
+        }
+        switch (action) {
+            case 'DATE_EXAM_OK':
+                this.demande.status = 'DATE_EXAM_OK'
+                this.demande.file = file
+                break
+            case 'RE_DATE_EXAM_OK':
+                this.demande.status = 'RE_DATE_EXAM_OK'
+                this.demande.file = file
+                break
+            case 'SPECIALITE_CHOISIE':
+                this.demande.status = 'SPECIALITE_CHOISIE'
+                this.demande['file[]'] = data
+                this.demande.file = file
+                break
+            case 'CENTRE_OK':
+                this.demande.status = 'CENTRE_OK'
+                this.demande['file[]'] = data
+                this.demande.file = file
+                break
+            default:
+                break
+        }
+    }
+
+    render() {
+        const { history } = this.props
+        if (!this.demande)
+            history.push({
+                pathname: `/demande/liste`,
+            })
+
+        return (
+            &lt;FormGroup style={{ width: '100%' }}>
+                &lt;div className="centerDiv" style={{ width: '90%' }}>
+                    &lt;h2>
+                        {&lt;FormattedMessage id="editApplication" />}{' '}
+                        {this.demande.code}
+                    &lt;/h2>
+                    &lt;Grid container>
+                        &lt;Grid item xs={12} sm={8} style={{ padding: 20 }}>
+                            &lt;Paper className="p-4">
+                                {this.displayAction()}
+                                &lt;div
+                                    style={{ textAlign: 'center' }}
+                                    className="p-4"
+                                >
+                                    &lt;ButtonComponent
+                                        color="secondary"
+                                        type="contained"
+                                        size="medium"
+                                        label={&lt;FormattedMessage id="cancel" />}
+                                        clicked={() => this.goBack()}
+                                    />
+                                    &lt;ButtonComponent
+                                        color="secondary"
+                                        type="contained"
+                                        size="medium"
+                                        label={&lt;FormattedMessage id="save" />}
+                                        clicked={this.editDemande}
+                                    />
+                                &lt;/div>
+                            &lt;/Paper>
+                        &lt;/Grid>
+                        &lt;Grid item xs={12} sm={4} style={{ padding: 20 }}>
+                            {this.renderDetails()}
+                        &lt;/Grid>
+                    &lt;/Grid>
+                &lt;/div>
+            &lt;/FormGroup>
+        )
+    }
+}
+
+const mapStateToProps = state => {
+    return {
+        loggedUser: state.login.response,
+        language: state.info.language,
+        response: state.demande.editDemande.response,
+        error: state.demande.editDemande.error,
+        allReferentiels: state.referencial.allReferencials.response,
+        allCenters: state.centreFormation.allCenters.response,
+        allUsers: state.user.allUsers.response,
+        allSpecialites: state.specialite.allSpecialites.response,
+    }
+}
+const mapDispatchToProps = dispatch => ({
+    getAllUsers: () => dispatch(getAllUsersActions.getAllUsersRequest()),
+    resetProps: () =>
+        dispatch(editDemandeActions.editDemandeSuccess({ data: {} })),
+    editDemande: payload =>
+        dispatch(editDemandeActions.editDemandeRequest(payload)),
+    getAllSpecialites: () =>
+        dispatch(getAllSpecialitesActions.getAllSpecialitesRequest()),
+    getAllCenters: () => dispatch(getAllCentersActions.getAllCentersRequest()),
+    alertShow: (show, info) =>
+        dispatch(
+            alertActions.alertShow(show, {
+                onConfirm: info.onConfirm,
+                warning: info.warning,
+                info: info.info,
+                error: info.error,
+                success: info.success,
+                message: info.message,
+                title: info.title,
+            })
+        ),
+})
+export default connect(
+    mapStateToProps,
+    mapDispatchToProps
+)(injectIntl(EditDemande))
+</code></pre>
+                </article>
+            </section>
+        </div>
+
+        <nav>
+            <h2><a href="index.html">Home</a></h2>
+            <h3>Classes</h3>
+            <ul>
+                <li><a href="AccessForm.html">AccessForm</a></li>
+                <li><a href="AccessForm.AccessForm.html">AccessForm</a></li>
+                <li><a href="AddReferentiel.html">AddReferentiel</a></li>
+                <li>
+                    <a href="AddReferentiel.AddReferentiel.html"
+                        >AddReferentiel</a
+                    >
+                </li>
+                <li><a href="AddUniteRegionale.html">AddUniteRegionale</a></li>
+                <li>
+                    <a href="AddUniteRegionale.AddUniteRegionale.html"
+                        >AddUniteRegionale</a
+                    >
+                </li>
+                <li><a href="DemandeList.html">DemandeList</a></li>
+                <li><a href="DemandeList.DemandeList.html">DemandeList</a></li>
+                <li><a href="EditDemande.html">EditDemande</a></li>
+                <li><a href="EditDemande.EditDemande.html">EditDemande</a></li>
+                <li><a href="EditDemandFactory.html">EditDemandFactory</a></li>
+                <li><a href="ListReferentiels.html">ListReferentiels</a></li>
+                <li>
+                    <a href="ListReferentiels.ListReferentiels.html"
+                        >ListReferentiels</a
+                    >
+                </li>
+                <li>
+                    <a href="ListUniteRegionale.html">ListUniteRegionale</a>
+                </li>
+                <li>
+                    <a href="ListUniteRegionale.ListUniteRegionale.html"
+                        >ListUniteRegionale</a
+                    >
+                </li>
+                <li><a href="MapBlock.html">MapBlock</a></li>
+                <li><a href="Index.html">Index</a></li>
+                <li><a href="Index.Index.html">Index</a></li>
+                <li><a href="Signup.html">Signup</a></li>
+                <li><a href="Signup.Signup.html">Signup</a></li>
+            </ul>
+            <h3>Global</h3>
+            <ul>
+                <li><a href="global.html#DateExam">DateExam</a></li>
+            </ul>
+        </nav>
+
+        <br class="clear" />
+
+        <footer>
+            Documentation generated by
+            <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.3</a> on Thu Sep
+            19 2019 10:07:37 GMT+0100 (GMT+01:00)
+        </footer>
+
+        <script>
+            prettyPrint()
+        </script>
+        <script src="scripts/linenumber.js"></script>
+    </body>
+</html>

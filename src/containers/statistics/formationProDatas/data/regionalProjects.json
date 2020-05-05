@@ -1,0 +1,20 @@
+[
+    {
+        "governorate": "Tunis",
+        "NumberOfProjects": "12536500",
+        "NumberOfInfrastructureProjects": "8600700",
+        "NumberOfDevelopmentProjects": "196200"
+    },
+    {
+        "governorate": "Nabeul",
+        "NumberOfProjects": "1853500",
+        "NumberOfInfrastructureProjects": "80700",
+        "NumberOfDevelopmentProjects": "19200"
+    },
+    {
+        "governorate": "Ariana",
+        "NumberOfProjects": "3336500",
+        "NumberOfInfrastructureProjects": "570700",
+        "NumberOfDevelopmentProjects": "246200"
+    }
+]

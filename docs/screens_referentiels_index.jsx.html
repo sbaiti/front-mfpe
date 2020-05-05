@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <title>JSDoc: Source: screens/referentiels/index.jsx</title>
+
+        <script src="scripts/prettify/prettify.js"></script>
+        <script src="scripts/prettify/lang-css.js"></script>
+        <!--[if lt IE 9]>
+            <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+        <![endif]-->
+        <link
+            type="text/css"
+            rel="stylesheet"
+            href="styles/prettify-tomorrow.css"
+        />
+        <link
+            type="text/css"
+            rel="stylesheet"
+            href="styles/jsdoc-default.css"
+        />
+    </head>
+
+    <body>
+        <div id="main">
+            <h1 class="page-title">Source: screens/referentiels/index.jsx</h1>
+
+            <section>
+                <article>
+                    <pre
+                        class="prettyprint source linenums"
+                    ><code>/* eslint-disable react/forbid-prop-types */
+import React, { Fragment } from 'react'
+import { FormattedMessage, injectIntl } from 'react-intl'
+import PropTypes from 'prop-types'
+import { connect } from 'react-redux'
+import { Paper } from '@material-ui/core'
+import MaterialTable from 'material-table'
+import alertActions from '../../redux/alert'
+import { MuiTable } from '../../components/ui/table'
+import deleteReferenceActions from '../../redux/referencial/deleteReferencial'
+import editReferenceActions from '../../redux/referencial/editReferencial'
+import getAllReferenceActions from '../../redux/referencial/getAllReferencial'
+
+/**
+ * display referentiels list
+ *
+ * @class ListReferentiels
+ * @extends {React.Component}
+ */
+class ListReferentiels extends React.Component {
+    static propTypes = {
+        getAllReferentiels: PropTypes.func.isRequired,
+        allReferenciels: PropTypes.object,
+        history: PropTypes.object.isRequired,
+        intl: PropTypes.object.isRequired,
+        language: PropTypes.string.isRequired,
+        alertShow: PropTypes.func.isRequired,
+        removeReferentiel: PropTypes.func.isRequired,
+        editReferentiel: PropTypes.func.isRequired,
+    }
+
+    static defaultProps = {
+        allReferenciels: {},
+    }
+
+    /**
+     * Creates an instance of ListReferentiels.
+     * @param {*} props
+     * @memberof ListReferentiels
+     */
+    constructor(props) {
+        super(props)
+        this.state = {}
+        const { allReferenciels, getAllReferentiels } = props
+        if (!allReferenciels || !allReferenciels.referenciels)
+            getAllReferentiels()
+        this.columns = [
+            {
+                field: 'code',
+                title: &lt;FormattedMessage id="number" />,
+            },
+            {
+                field: 'intituleFr',
+                title: &lt;FormattedMessage id="titleFr" />,
+            },
+            {
+                field: 'intituleAr',
+                title: &lt;FormattedMessage id="titleAr" />,
+            },
+            {
+                field: 'categorie',
+                title: &lt;FormattedMessage id="category" />,
+            },
+            // {
+            //     field: 'parent',
+            //     title: &lt;FormattedMessage id="speciality" />,
+            // },
+        ]
+    }
+
+    /**
+     * onRemove: remove a referentiel
+     *
+     * @memberof ListReferentiels
+     * @param {integer} id
+     */
+    onRemove = id => {
+        const { alertShow, language, removeReferentiel } = this.props
+        alertShow(true, {
+            onConfirm: () => {
+                removeReferentiel(id)
+            },
+            warning: true,
+            info: false,
+            error: false,
+            success: false,
+            message:
+                language === 'ar'
+                    ? 'هل تريد حقًا حذف هذا المرجع؟'
+                    : 'Voulez vous vraiment supprimer ce reférentiel?',
+            title: language === 'ar' ? 'تأكيد' : 'Confirmation',
+        })
+    }
+
+    /**
+     *onAdd: redirect to add referentiel interace
+     *
+     * @memberof ListReferentiels
+     */
+    onAdd = () => {
+        const { history } = this.props
+        history.push({
+            pathname: `/referentiels/ajouter/`,
+        })
+    }
+
+    /**
+     * renderDetails: deails of a referentiel
+     *
+     * @memberof ListReferentiels
+     */
+    renderDetails = item => {
+        const { intl, editReferentiel } = this.props
+        const columns = [
+            {
+                title: 'text',
+                field: 'text',
+                editable: 'never',
+                cellStyle: { textAlign: 'inherit', fontWeight: 'bold' },
+            },
+            {
+                title: 'value',
+                field: 'value',
+                cellStyle: { textAlign: 'inherit' },
+            },
+        ]
+        const data = [
+            {
+                name: 'code',
+                text: intl.formatMessage({ id: 'code' }),
+                value: item.code,
+            },
+            {
+                name: 'intituleAr',
+                text: intl.formatMessage({ id: 'titleAr' }),
+                value: item.intituleAr,
+            },
+            {
+                name: 'intituleFr',
+                text: intl.formatMessage({ id: 'titleFr' }),
+                value: item.intituleFr,
+            },
+            {
+                name: 'categorie',
+                text: intl.formatMessage({ id: 'category' }),
+                value: item.categorie,
+            },
+        ]
+        return (
+            &lt;Fragment>
+                &lt;Paper className="p-4">
+                    &lt;MaterialTable
+                        columns={columns}
+                        data={data}
+                        options={{
+                            toolbar: false,
+                            showTitle: false,
+                            search: false,
+                            sorting: false,
+                            paging: false,
+                            header: false,
+                            detailPanelColumnAlignment: 'right',
+                            actionsColumnIndex: -1,
+                            rowStyle: rowData => {
+                                return {
+                                    display:
+                                        rowData.value &amp;&amp; rowData.value.length
+                                            ? ''
+                                            : 'none',
+                                }
+                            },
+                        }}
+                        editable={{
+                            isEditable: currentField => {
+                                if (currentField.name.indexOf('intitule') > -1)
+                                    return true
+                                return false
+                            },
+                            onRowUpdate: (newData, oldData) =>
+                                new Promise(resolve => {
+                                    setTimeout(() => {
+                                        {
+                                            const index = data.indexOf(oldData)
+                                            data[index] = newData
+                                            if (newData.value !== oldData.value)
+                                                editReferentiel({
+                                                    ...item,
+                                                    categorie: `Ref${item.categorie}`,
+                                                    [newData.name]:
+                                                        newData.value,
+                                                })
+                                        }
+                                        resolve()
+                                    }, 1000)
+                                }),
+                        }}
+                    />
+                &lt;/Paper>
+            &lt;/Fragment>
+        )
+    }
+
+    /**
+     * render component
+     *
+     * @returns {JSX}
+     * @memberof ListReferentiels
+     */
+    render() {
+        const { allReferenciels, intl, language } = this.props
+        // const lang = language === 'ar' ? 'intituleAr' : 'intituleFr'
+        let list = []
+        Object.keys(allReferenciels.referenciels).forEach(key => {
+            const items = allReferenciels.referenciels[key].map(e => {
+                return {
+                    ...e,
+                    categorie: key.replace('Ref', ''),
+                    // code: e.code || 'non défini',
+                }
+            })
+            list = [...list, ...items]
+        })
+
+        return (
+            &lt;MuiTable
+                intl={intl}
+                columns={this.columns}
+                list={list}
+                title={&lt;FormattedMessage id="referencesList" />}
+                // edit={e => this.onEdit(e)}
+                language={language}
+                details={e => this.renderDetails(e)}
+                add={e => this.onAdd(e)}
+                remove={e => this.onRemove(e)}
+            />
+        )
+    }
+}
+
+const mapStateToProps = state => {
+    return {
+        loggedUser: state.login.response.User.details,
+        language: state.info.language,
+        allReferenciels: state.referencial.allReferencials.response,
+    }
+}
+const mapDispatchToProps = dispatch => ({
+    getAllReferentiels: () =>
+        dispatch(getAllReferenceActions.getAllReferenceRequest()),
+    removeReferentiel: id =>
+        dispatch(deleteReferenceActions.deleteReferenceRequest(id)),
+    editReferentiel: id =>
+        dispatch(editReferenceActions.editReferenceRequest(id)),
+    alertShow: (show, info) =>
+        dispatch(
+            alertActions.alertShow(show, {
+                onConfirm: info.onConfirm,
+                warning: info.warning,
+                info: info.info,
+                error: info.error,
+                success: info.success,
+                message: info.message,
+                title: info.title,
+            })
+        ),
+})
+export default connect(
+    mapStateToProps,
+    mapDispatchToProps
+)(injectIntl(ListReferentiels))
+</code></pre>
+                </article>
+            </section>
+        </div>
+
+        <nav>
+            <h2><a href="index.html">Home</a></h2>
+            <h3>Classes</h3>
+            <ul>
+                <li><a href="AccessForm.html">AccessForm</a></li>
+                <li><a href="AccessForm.AccessForm.html">AccessForm</a></li>
+                <li><a href="AddReferentiel.html">AddReferentiel</a></li>
+                <li>
+                    <a href="AddReferentiel.AddReferentiel.html"
+                        >AddReferentiel</a
+                    >
+                </li>
+                <li><a href="AddUniteRegionale.html">AddUniteRegionale</a></li>
+                <li>
+                    <a href="AddUniteRegionale.AddUniteRegionale.html"
+                        >AddUniteRegionale</a
+                    >
+                </li>
+                <li><a href="DemandeList.html">DemandeList</a></li>
+                <li><a href="DemandeList.DemandeList.html">DemandeList</a></li>
+                <li><a href="EditDemande.html">EditDemande</a></li>
+                <li><a href="EditDemande.EditDemande.html">EditDemande</a></li>
+                <li><a href="EditDemandFactory.html">EditDemandFactory</a></li>
+                <li><a href="ListReferentiels.html">ListReferentiels</a></li>
+                <li>
+                    <a href="ListReferentiels.ListReferentiels.html"
+                        >ListReferentiels</a
+                    >
+                </li>
+                <li>
+                    <a href="ListUniteRegionale.html">ListUniteRegionale</a>
+                </li>
+                <li>
+                    <a href="ListUniteRegionale.ListUniteRegionale.html"
+                        >ListUniteRegionale</a
+                    >
+                </li>
+                <li><a href="MapBlock.html">MapBlock</a></li>
+                <li><a href="Index.html">Index</a></li>
+                <li><a href="Index.Index.html">Index</a></li>
+                <li><a href="Signup.html">Signup</a></li>
+                <li><a href="Signup.Signup.html">Signup</a></li>
+            </ul>
+            <h3>Global</h3>
+            <ul>
+                <li><a href="global.html#DateExam">DateExam</a></li>
+            </ul>
+        </nav>
+
+        <br class="clear" />
+
+        <footer>
+            Documentation generated by
+            <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.3</a> on Thu Sep
+            19 2019 10:07:37 GMT+0100 (GMT+01:00)
+        </footer>
+
+        <script>
+            prettyPrint()
+        </script>
+        <script src="scripts/linenumber.js"></script>
+    </body>
+</html>

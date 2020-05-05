@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <title>
+            JSDoc: Source: components/demande/EditDemandFactory/index.jsx
+        </title>
+
+        <script src="scripts/prettify/prettify.js"></script>
+        <script src="scripts/prettify/lang-css.js"></script>
+        <!--[if lt IE 9]>
+            <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+        <![endif]-->
+        <link
+            type="text/css"
+            rel="stylesheet"
+            href="styles/prettify-tomorrow.css"
+        />
+        <link
+            type="text/css"
+            rel="stylesheet"
+            href="styles/jsdoc-default.css"
+        />
+    </head>
+
+    <body>
+        <div id="main">
+            <h1 class="page-title">
+                Source: components/demande/EditDemandFactory/index.jsx
+            </h1>
+
+            <section>
+                <article>
+                    <pre
+                        class="prettyprint source linenums"
+                    ><code>import React from 'react'
+import PropTypes from 'prop-types'
+import DateExamSwitcher from './actions/DateExamSwitcher'
+import AttenteDr from './actions/AttenteDr'
+import PaymentOk from './actions/PaymentOk'
+import ScanOk from './actions/ScanOk'
+import SpecialiteChoisie from './actions/SpecialiteChoisie'
+import PvUpload from './actions/PvUpload'
+import AttentePaiment from './actions/AttentePaiement'
+
+/**
+ * Edit demand factory
+ *
+ * @class EditDemandFactory
+ */
+class EditDemandFactory extends React.Component {
+    /**
+     * Handle Upload
+     *
+     * @param {object} file
+     * @memberof EditDemandFactory
+     */
+    handleUpload = file => {
+        const { data, update } = this.props
+        const fileData = new FormData()
+        fileData.append('file', file)
+        update(data.action, fileData, file)
+    }
+
+    /**
+     * Render
+     *
+     * @returns
+     * @memberof EditDemandFactory
+     */
+    render() {
+        const { data } = this.props
+        switch (data.action) {
+            case 'ATTENTE_DR':
+                return &lt;AttenteDr {...data.props} />
+            case 'DATE_EXAM_OK':
+                return (
+                    &lt;DateExamSwitcher
+                        action={data.action}
+                        onGetFile={this.handleUpload}
+                        {...data.props}
+                    />
+                )
+            case 'RE_DATE_EXAM_OK':
+                return (
+                    &lt;DateExamSwitcher
+                        action={data.action}
+                        onGetFile={this.handleUpload}
+                        {...data.props}
+                    />
+                )
+            case 'PAIEMENT_OK':
+                return &lt;PaymentOk {...data.props} />
+            case 'PV_UPLOAD':
+                return &lt;PvUpload {...data.props} />
+            case 'SCAN_OK':
+                return &lt;ScanOk {...data.props} />
+            case 'ATTENTE_PAIEMENT':
+                return &lt;AttentePaiment {...data.props} />
+            case 'SPECIALITE_CHOISIE':
+                return (
+                    &lt;SpecialiteChoisie
+                        onGetFile={this.handleUpload}
+                        {...data.props}
+                    />
+                )
+            case 'CENTRE_OK':
+                return (
+                    &lt;SpecialiteChoisie
+                        onGetFile={this.handleUpload}
+                        {...data.props}
+                    />
+                )
+            default:
+                return undefined
+        }
+    }
+}
+
+EditDemandFactory.propTypes = {
+    // eslint-disable-next-line react/forbid-prop-types
+    data: PropTypes.object.isRequired,
+    update: PropTypes.func.isRequired,
+}
+
+export default EditDemandFactory
+</code></pre>
+                </article>
+            </section>
+        </div>
+
+        <nav>
+            <h2><a href="index.html">Home</a></h2>
+            <h3>Classes</h3>
+            <ul>
+                <li><a href="AccessForm.html">AccessForm</a></li>
+                <li><a href="AccessForm.AccessForm.html">AccessForm</a></li>
+                <li><a href="AddReferentiel.html">AddReferentiel</a></li>
+                <li>
+                    <a href="AddReferentiel.AddReferentiel.html"
+                        >AddReferentiel</a
+                    >
+                </li>
+                <li><a href="AddUniteRegionale.html">AddUniteRegionale</a></li>
+                <li>
+                    <a href="AddUniteRegionale.AddUniteRegionale.html"
+                        >AddUniteRegionale</a
+                    >
+                </li>
+                <li><a href="DemandeList.html">DemandeList</a></li>
+                <li><a href="DemandeList.DemandeList.html">DemandeList</a></li>
+                <li><a href="EditDemande.html">EditDemande</a></li>
+                <li><a href="EditDemande.EditDemande.html">EditDemande</a></li>
+                <li><a href="EditDemandFactory.html">EditDemandFactory</a></li>
+                <li><a href="ListReferentiels.html">ListReferentiels</a></li>
+                <li>
+                    <a href="ListReferentiels.ListReferentiels.html"
+                        >ListReferentiels</a
+                    >
+                </li>
+                <li>
+                    <a href="ListUniteRegionale.html">ListUniteRegionale</a>
+                </li>
+                <li>
+                    <a href="ListUniteRegionale.ListUniteRegionale.html"
+                        >ListUniteRegionale</a
+                    >
+                </li>
+                <li><a href="MapBlock.html">MapBlock</a></li>
+                <li><a href="Index.html">Index</a></li>
+                <li><a href="Index.Index.html">Index</a></li>
+                <li><a href="Signup.html">Signup</a></li>
+                <li><a href="Signup.Signup.html">Signup</a></li>
+            </ul>
+            <h3>Global</h3>
+            <ul>
+                <li><a href="global.html#DateExam">DateExam</a></li>
+            </ul>
+        </nav>
+
+        <br class="clear" />
+
+        <footer>
+            Documentation generated by
+            <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.3</a> on Thu Sep
+            19 2019 10:07:37 GMT+0100 (GMT+01:00)
+        </footer>
+
+        <script>
+            prettyPrint()
+        </script>
+        <script src="scripts/linenumber.js"></script>
+    </body>
+</html>

@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <title>
+            JSDoc: Source:
+            components/demande/EditDemandFactory/actions/DateExam.jsx
+        </title>
+
+        <script src="scripts/prettify/prettify.js"></script>
+        <script src="scripts/prettify/lang-css.js"></script>
+        <!--[if lt IE 9]>
+            <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+        <![endif]-->
+        <link
+            type="text/css"
+            rel="stylesheet"
+            href="styles/prettify-tomorrow.css"
+        />
+        <link
+            type="text/css"
+            rel="stylesheet"
+            href="styles/jsdoc-default.css"
+        />
+    </head>
+
+    <body>
+        <div id="main">
+            <h1 class="page-title">
+                Source:
+                components/demande/EditDemandFactory/actions/DateExam.jsx
+            </h1>
+
+            <section>
+                <article>
+                    <pre
+                        class="prettyprint source linenums"
+                    ><code>/* eslint-disable react/forbid-prop-types */
+import React, { useEffect, useState, Fragment } from 'react'
+import { useDropzone } from 'react-dropzone'
+import { CloudUploadSharp } from '@material-ui/icons'
+import PropTypes from 'prop-types'
+import { FormattedMessage, injectIntl } from 'react-intl'
+
+const thumbsContainer = {
+    display: 'flex',
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    marginTop: 16,
+}
+
+const thumb = {
+    display: 'inline-flex',
+    borderRadius: 2,
+    border: '1px solid #eaeaea',
+    marginBottom: 8,
+    marginRight: 8,
+    width: '100%',
+    height: '100%',
+    padding: 4,
+    boxSizing: 'border-box',
+}
+
+const thumbInner = {
+    display: 'flex',
+    margin: '0 auto',
+    overflow: 'hidden',
+}
+
+const draggableInput = {
+    border: '2px dashed #49a0ae',
+    outline: 0,
+}
+/**
+ *
+ *
+ * @param {*} props
+ * @returns
+ */
+const DateExam = props => {
+    const [files, setFiles] = useState([])
+    const [errors, setErrors] = useState([])
+    const { onGetFileUpload, isError, errorsList, intl } = props
+    const {
+        getRootProps,
+        getInputProps,
+        isDragAccept,
+        isDragReject,
+    } = useDropzone({
+        accept: 'application/pdf',
+        onDrop: acceptedFiles => {
+            setFiles(
+                acceptedFiles.map(file =>
+                    Object.assign(file, {
+                        preview: URL.createObjectURL(file),
+                    })
+                )
+            )
+            onGetFileUpload(acceptedFiles[0])
+        },
+        maxSize: 1048576,
+        onDropRejected: () => {
+            setErrors(
+                intl.formatMessage({
+                    id: 'WRONG_ALERT',
+                })
+            )
+        },
+        onDropAccepted: () => {
+            setErrors('')
+        },
+    })
+
+    const thumbs = files.map(file => (
+        &lt;div style={thumb} key={file.name}>
+            &lt;div style={thumbInner}>
+                &lt;iframe
+                    id="pdf_doc"
+                    title={file.name}
+                    src={file.preview}
+                    type="application/pdf"
+                    width="400"
+                    height="600"
+                    style={{ overflow: 'auto' }}
+                >&lt;/iframe>
+            &lt;/div>
+        &lt;/div>
+    ))
+
+    useEffect(
+        () => () => {
+            // Make sure to revoke the data uris to avoid memory leaks
+            files.forEach(file => URL.revokeObjectURL(file.preview))
+        },
+        [files]
+    )
+    const fileError =
+        (isError &amp;&amp; Object.keys(errorsList).includes('file')) ||
+        Object.keys(errors).length > 0
+    return (
+        &lt;Fragment>
+            &lt;div
+                {...getRootProps({ className: 'dropzone' })}
+                className={`p-4 text-center ${
+                    isDragAccept ? 'border-success' : null
+                } ${isDragReject || fileError ? 'border-danger' : null}`}
+                style={draggableInput}
+            >
+                &lt;input {...getInputProps()} />
+                &lt;p>
+                    &lt;FormattedMessage id="dragDropDescription" />
+                &lt;/p>
+
+                &lt;CloudUploadSharp color="secondary" fontSize="large" />
+            &lt;/div>
+            &lt;aside style={thumbsContainer}>{thumbs}&lt;/aside>
+            {fileError &amp;&amp; (
+                &lt;div className="alert alert-danger text-left" role="alert">
+                    {errors}
+                    &lt;ul>
+                        &lt;li>
+                            &lt;FormattedMessage id="fileTypeInfo" />
+                        &lt;/li>
+                        &lt;li>
+                            &lt;FormattedMessage id="fileMaxSizeInfo" />
+                        &lt;/li>
+                    &lt;/ul>
+                &lt;/div>
+            )}
+        &lt;/Fragment>
+    )
+}
+export default injectIntl(DateExam)
+
+DateExam.propTypes = {
+    intl: PropTypes.object.isRequired,
+    onGetFileUpload: PropTypes.func.isRequired,
+    errorsList: PropTypes.object.isRequired,
+    isError: PropTypes.bool.isRequired,
+}
+</code></pre>
+                </article>
+            </section>
+        </div>
+
+        <nav>
+            <h2><a href="index.html">Home</a></h2>
+            <h3>Classes</h3>
+            <ul>
+                <li><a href="AccessForm.html">AccessForm</a></li>
+                <li><a href="AccessForm.AccessForm.html">AccessForm</a></li>
+                <li><a href="AddReferentiel.html">AddReferentiel</a></li>
+                <li>
+                    <a href="AddReferentiel.AddReferentiel.html"
+                        >AddReferentiel</a
+                    >
+                </li>
+                <li><a href="AddUniteRegionale.html">AddUniteRegionale</a></li>
+                <li>
+                    <a href="AddUniteRegionale.AddUniteRegionale.html"
+                        >AddUniteRegionale</a
+                    >
+                </li>
+                <li><a href="DemandeList.html">DemandeList</a></li>
+                <li><a href="DemandeList.DemandeList.html">DemandeList</a></li>
+                <li><a href="EditDemande.html">EditDemande</a></li>
+                <li><a href="EditDemande.EditDemande.html">EditDemande</a></li>
+                <li><a href="EditDemandFactory.html">EditDemandFactory</a></li>
+                <li><a href="ListReferentiels.html">ListReferentiels</a></li>
+                <li>
+                    <a href="ListReferentiels.ListReferentiels.html"
+                        >ListReferentiels</a
+                    >
+                </li>
+                <li>
+                    <a href="ListUniteRegionale.html">ListUniteRegionale</a>
+                </li>
+                <li>
+                    <a href="ListUniteRegionale.ListUniteRegionale.html"
+                        >ListUniteRegionale</a
+                    >
+                </li>
+                <li><a href="MapBlock.html">MapBlock</a></li>
+                <li><a href="Index.html">Index</a></li>
+                <li><a href="Index.Index.html">Index</a></li>
+                <li><a href="Signup.html">Signup</a></li>
+                <li><a href="Signup.Signup.html">Signup</a></li>
+            </ul>
+            <h3>Global</h3>
+            <ul>
+                <li><a href="global.html#DateExam">DateExam</a></li>
+            </ul>
+        </nav>
+
+        <br class="clear" />
+
+        <footer>
+            Documentation generated by
+            <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.3</a> on Thu Sep
+            19 2019 10:07:37 GMT+0100 (GMT+01:00)
+        </footer>
+
+        <script>
+            prettyPrint()
+        </script>
+        <script src="scripts/linenumber.js"></script>
+    </body>
+</html>

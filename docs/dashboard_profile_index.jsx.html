@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <title>JSDoc: Source: dashboard/profile/index.jsx</title>
+
+        <script src="scripts/prettify/prettify.js"></script>
+        <script src="scripts/prettify/lang-css.js"></script>
+        <!--[if lt IE 9]>
+            <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+        <![endif]-->
+        <link
+            type="text/css"
+            rel="stylesheet"
+            href="styles/prettify-tomorrow.css"
+        />
+        <link
+            type="text/css"
+            rel="stylesheet"
+            href="styles/jsdoc-default.css"
+        />
+    </head>
+
+    <body>
+        <div id="main">
+            <h1 class="page-title">Source: dashboard/profile/index.jsx</h1>
+
+            <section>
+                <article>
+                    <pre
+                        class="prettyprint source linenums"
+                    ><code>/* eslint-disable react/forbid-prop-types */
+import React from 'react'
+import MaterialTable from 'material-table'
+import { injectIntl, FormattedMessage } from 'react-intl'
+import PropTypes from 'prop-types'
+import { connect } from 'react-redux'
+import editUserActions from '../../../redux/user/editUser'
+import getAllReferenceActions from '../../../redux/referencial/getAllReferencial'
+
+/**
+ *
+ * @class Index
+ * @extends {React.Component}
+ */
+class Index extends React.Component {
+    /**
+     * Creates an instance of Index.
+     * @param {*} props
+     * @memberof Index
+     */
+    constructor(props) {
+        super(props)
+        const { intl } = this.props
+        this.payload = {
+            columns: [
+                {
+                    title: 'text',
+                    field: 'text',
+                    editable: 'never',
+                    cellStyle: { textAlign: 'inherit', fontWeight: 'bold' },
+                },
+                {
+                    title: 'value',
+                    field: 'value',
+                    cellStyle: { textAlign: 'inherit' },
+                },
+            ],
+            data: [
+                {
+                    name: 'prenomFr',
+                    text: intl.formatMessage({ id: 'labelPrenom' }),
+                    value: props.prenomFr,
+                },
+                {
+                    name: 'nomFr',
+                    text: intl.formatMessage({ id: 'labelNom' }),
+                    value: props.nomFr,
+                },
+                {
+                    name: 'email',
+                    text: intl.formatMessage({ id: 'labelAdressemail' }),
+                    value: props.email,
+                },
+                {
+                    name: 'tel',
+                    text: intl.formatMessage({ id: 'labelTelephone' }),
+                    value: props.tel,
+                },
+                {
+                    name: 'numCin',
+                    text: intl.formatMessage({ id: 'labelNumeroCIN' }),
+                    value: props.numCin,
+                },
+                {
+                    name: 'dateDelivranceCin',
+                    text: intl.formatMessage({ id: 'labelDatededelivrance' }),
+                    value: this.formatDate(props.dateDelivranceCin),
+                },
+                {
+                    name: 'numPassport',
+                    text: intl.formatMessage({ id: 'labelNumeroPasseport' }),
+                    value: props.numPassport,
+                },
+                {
+                    name: 'dateDelivrancePassport',
+                    text: intl.formatMessage({ id: 'labelDatededelivrance' }),
+                    value: this.formatDate(props.dateDelivrancePassport),
+                },
+                {
+                    name: 'numCarteSejour',
+                    text: intl.formatMessage({ id: 'labelNdecartedesejour' }),
+                    value: props.numCarteSejour,
+                },
+                {
+                    name: 'dateValiditeSejour',
+                    text: intl.formatMessage({
+                        id: 'labelDatedevaliditedesejour',
+                    }),
+                    value: props.dateValiditeSejour,
+                },
+                {
+                    name: 'nationalite',
+                    text: intl.formatMessage({ id: 'labelNationalite' }),
+                    value:
+                        props.language === 'fr'
+                            ? props.nationalite.intituleFr
+                            : props.nationalite.intituleAr,
+                },
+                {
+                    name: 'dateNaissance',
+                    text: intl.formatMessage({ id: 'labelDatedenaissance' }),
+                    value: this.formatDate(props.dateNaissance),
+                },
+                {
+                    name: 'lieuNaissance',
+                    text: intl.formatMessage({ id: 'labelLieudenaissance' }),
+                    value: props.lieuNaissance,
+                },
+                {
+                    name: 'gouvernorat',
+                    text: intl.formatMessage({ id: 'labelGouvernorat' }),
+                    value:
+                        props.language === 'fr'
+                            ? props.gouvernorat.intituleFr
+                            : props.gouvernorat.intituleAr,
+                },
+                {
+                    name: 'delegation',
+                    text: intl.formatMessage({ id: 'labelDelegation' }),
+                    value:
+                        props.language === 'fr'
+                            ? props.delegation.intituleFr
+                            : props.delegation.intituleAr,
+                },
+                {
+                    name: 'sexe',
+                    text: intl.formatMessage({ id: 'labelSexe' }),
+                    value: props.sexe,
+                },
+                {
+                    name: 'language',
+                    text: intl.formatMessage({ id: 'labelNiveaudetude' }),
+                    value:
+                        props.language === 'fr'
+                            ? props.niveauEtude.intituleFr
+                            : props.niveauEtude.intituleAr,
+                },
+                {
+                    name: 'personneBesoinSpecifique',
+                    text: intl.formatMessage({
+                        id: 'labelPersonneabesoinsspecifiques',
+                    }),
+                    value: props.personneBesoinSpecifique
+                        ? props.intl.formatMessage({ id: 'optionOui' })
+                        : props.intl.formatMessage({ id: 'optionNon' }),
+                },
+                {
+                    name: 'natureBesoinSpecifique',
+                    text: intl.formatMessage({
+                        id: 'labelNaturedesbesoinsspecifiques',
+                    }),
+                    value: props.natureBesoinSpecifique,
+                },
+            ],
+        }
+    }
+
+    /**
+     * Handle Logout
+     *
+     * @param{object} e
+     * @memberof Index
+     */
+    handleLogout = e => {
+        const { logout } = this.props
+        e.preventDefault()
+        logout()
+    }
+
+    /**
+     * Edit User
+     *
+     * @param{object} newData
+     * @memberof Index
+     */
+    editUser = newData => {
+        const { edit } = this.props
+        if (newData.value.length === 0) return
+        edit({ email: newData.value })
+    }
+
+    /**
+     * Format Date
+     *
+     * @param{string} date
+     * @memberof Index
+     */
+    formatDate = date => {
+        if (!date) return null
+        try {
+            const currentDatetime = new Date(date)
+            return `${currentDatetime.getDate()}-${currentDatetime.getMonth() +
+                1}-${currentDatetime.getFullYear()}`
+        } catch (e) {
+            console.error(e)
+            return null
+        }
+    }
+
+    render() {
+        const { error, success, language, response } = this.props
+        return (
+            &lt;div style={{ width: 'fit-content', margin: '10px auto' }}>
+                {error &amp;&amp; (
+                    &lt;div className="alert alert-danger" role="alert">
+                        {language === 'fr'
+                            ? response.data.data.email.fr
+                            : response.data.data.email.ar}
+                    &lt;/div>
+                )}
+                {success &amp;&amp; (
+                    &lt;div className="alert alert-success" role="alert">
+                        &lt;FormattedMessage id="emailEditSuccess" />
+                    &lt;/div>
+                )}
+
+                &lt;MaterialTable
+                    columns={this.payload.columns}
+                    data={this.payload.data}
+                    options={{
+                        toolbar: false,
+                        showTitle: false,
+                        search: false,
+                        sorting: false,
+                        paging: false,
+                        header: false,
+                        detailPanelColumnAlignment: 'right',
+                        actionsColumnIndex: -1,
+                        rowStyle: rowData => ({
+                            display:
+                                rowData.value !== null &amp;&amp; rowData.value.length
+                                    ? ''
+                                    : 'none',
+                        }),
+                    }}
+                    editable={{
+                        isEditable: currentField => {
+                            if (currentField.name === 'email') return true
+                            return false
+                        },
+                        onRowUpdate: (newData, oldData) =>
+                            new Promise(resolve => {
+                                setTimeout(() => {
+                                    {
+                                        const { data } = this.payload
+                                        const index = data.indexOf(oldData)
+                                        data[index] = newData
+                                        if (newData.value !== oldData.value)
+                                            this.editUser(newData)
+                                    }
+                                    resolve()
+                                }, 1000)
+                            }),
+                    }}
+                />
+            &lt;/div>
+        )
+    }
+}
+Index.defaultProps = {
+    language: '',
+    error: false,
+    success: false,
+    response: '',
+    nomFr: '',
+    prenomFr: '',
+    gouvernorat: '',
+    delegation: '',
+    tel: '',
+    email: '',
+    sexe: '',
+    numCin: '',
+    nationalite: '',
+    dateNaissance: '',
+    niveauEtude: '',
+    personneBesoinSpecifique: '',
+    natureBesoinSpecifique: '',
+    lieuNaissance: '',
+    dateDelivranceCin: '',
+    dateDelivrancePassport: '',
+    dateValiditeSejour: '',
+    numPassport: '',
+    numCarteSejour: '',
+}
+Index.propTypes = {
+    language: PropTypes.string,
+    response: PropTypes.object,
+    error: PropTypes.bool,
+    success: PropTypes.bool,
+    intl: PropTypes.object.isRequired,
+    edit: PropTypes.func.isRequired,
+    logout: PropTypes.func.isRequired,
+    nomFr: PropTypes.string,
+    prenomFr: PropTypes.string,
+    gouvernorat: PropTypes.object,
+    delegation: PropTypes.object,
+    tel: PropTypes.string,
+    email: PropTypes.string,
+    sexe: PropTypes.string,
+    numCin: PropTypes.string,
+    nationalite: PropTypes.object,
+    dateNaissance: PropTypes.string,
+    niveauEtude: PropTypes.object,
+    personneBesoinSpecifique: PropTypes.bool,
+    natureBesoinSpecifique: PropTypes.string,
+    lieuNaissance: PropTypes.string,
+    dateDelivranceCin: PropTypes.string,
+    dateDelivrancePassport: PropTypes.string,
+    dateValiditeSejour: PropTypes.string,
+    numPassport: PropTypes.string,
+    numCarteSejour: PropTypes.string,
+}
+
+const mapStateToProps = ({ info, user, referencial, login }) => ({
+    language: info.language,
+    response: user.editUser.response,
+    error: user.editUser.error,
+    success: user.editUser.success,
+    allReferenciels: referencial.allReferencials.response,
+    nomFr: login.response.User.details.nomFr,
+    prenomFr: login.response.User.details.prenomFr,
+    gouvernorat: login.response.User.details.gouvernorat,
+    delegation: login.response.User.details.delegation,
+    tel: login.response.User.details.tel,
+    email: login.response.User.details.email,
+    sexe: login.response.User.details.sexe,
+    numCin: login.response.User.details.numCin,
+    nationalite: login.response.User.details.nationalite,
+    dateNaissance: login.response.User.details.dateNaissance,
+    niveauEtude: login.response.User.details.niveauEtude,
+    personneBesoinSpecifique:
+        login.response.User.details.personneBesoinSpecifique,
+    natureBesoinSpecifique: login.response.User.details.natureBesoinSpecifique,
+    lieuNaissance: login.response.User.details.lieuNaissance,
+    dateDelivranceCin: login.response.User.details.dateDelivranceCin,
+    dateDelivrancePassport: login.response.User.details.dateDelivrancePassport,
+    dateValiditeSejour: login.response.User.details.dateValiditeSejour,
+    numPassport: login.response.User.details.numPassport,
+    numCarteSejour: login.response.User.details.numCarteSejour,
+})
+
+const mapDispatchToProps = dispatch => ({
+    edit: payload => dispatch(editUserActions.editUserRequest(payload)),
+    getAllReferentiels: () =>
+        dispatch(getAllReferenceActions.getAllReferenceRequest()),
+    logout: () =>
+        dispatch({
+            type: 'SIGNOUT_REQUEST',
+        }),
+})
+export default connect(
+    mapStateToProps,
+    mapDispatchToProps
+)(injectIntl(Index))
+</code></pre>
+                </article>
+            </section>
+        </div>
+
+        <nav>
+            <h2><a href="index.html">Home</a></h2>
+            <h3>Classes</h3>
+            <ul>
+                <li><a href="Index.html">Index</a></li>
+                <li><a href="Index.Index.html">Index</a></li>
+                <li><a href="Signup.html">Signup</a></li>
+                <li><a href="Signup.Signup.html">Signup</a></li>
+            </ul>
+        </nav>
+
+        <br class="clear" />
+
+        <footer>
+            Documentation generated by
+            <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.3</a> on Mon Aug
+            19 2019 13:59:29 GMT+0100 (GMT+01:00)
+        </footer>
+
+        <script>
+            prettyPrint()
+        </script>
+        <script src="scripts/linenumber.js"></script>
+    </body>
+</html>

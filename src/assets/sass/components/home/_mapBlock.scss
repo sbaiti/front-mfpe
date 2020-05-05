@@ -1,0 +1,22 @@
+.map-block {
+    text-align: center;
+
+    #select-gov {
+        margin: 2px 0;
+        min-width: 250px;
+        background-color: transparent;
+
+        &:hover {
+            border-color: $blue-tint-500;
+        }
+    }
+}
+
+.land {
+    cursor: pointer;
+    fill: $blue-shades-200;
+
+    &:hover {
+        fill: $secondary;
+    }
+}

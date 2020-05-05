@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <title>JSDoc: Source: components/forms/accessForm.jsx</title>
+
+        <script src="scripts/prettify/prettify.js"></script>
+        <script src="scripts/prettify/lang-css.js"></script>
+        <!--[if lt IE 9]>
+            <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+        <![endif]-->
+        <link
+            type="text/css"
+            rel="stylesheet"
+            href="styles/prettify-tomorrow.css"
+        />
+        <link
+            type="text/css"
+            rel="stylesheet"
+            href="styles/jsdoc-default.css"
+        />
+    </head>
+
+    <body>
+        <div id="main">
+            <h1 class="page-title">Source: components/forms/accessForm.jsx</h1>
+
+            <section>
+                <article>
+                    <pre
+                        class="prettyprint source linenums"
+                    ><code>import React from 'react'
+import { Button, TextField } from '@material-ui/core'
+import { withRouter } from 'react-router-dom'
+import { compose } from 'redux'
+import { FormattedMessage, injectIntl } from 'react-intl'
+import { connect } from 'react-redux'
+import PropTypes from 'prop-types'
+import loginActions from '../../redux/login/index'
+
+/**
+ * Access Form
+ *
+ * @class AccessForm
+ * @extends {React.Component}
+ */
+class AccessForm extends React.Component {
+    /**
+     * Creates an instance of AccessForm.
+     *
+     * @param {*} props
+     * @memberof AccessForm
+     */
+    constructor(props) {
+        super(props)
+        this.userName = ''
+        this.passWord = ''
+    }
+
+    /**
+     * On change input
+     *
+     * @param {string} value
+     * @param {integer} whichOne
+     * @memberof AccessForm
+     */
+    onChangeInput = (value, whichOne) => {
+        if (whichOne) {
+            this.userName = value
+        } else {
+            this.passWord = value
+        }
+    }
+
+    /**
+     * Login
+     *
+     * @memberof AccessForm
+     */
+    login = () => {
+        const { loginRequest } = this.props
+        loginRequest({
+            username: this.userName,
+            password: this.passWord,
+        })
+    }
+
+    render() {
+        // eslint-disable-next-line react/prop-types
+        const { intl, loginError, fetchingLogin } = this.props
+        return (
+            &lt;div className="access-form-block">
+                &lt;form className="access-form" action="/">
+                    &lt;TextField
+                        id="outlined-login-input"
+                        placeholder={intl.formatMessage({
+                            id: 'login',
+                        })}
+                        className="login-textField"
+                        type="text"
+                        name="login"
+                        autoComplete="login"
+                        variant="outlined"
+                        margin="dense"
+                        onChange={event =>
+                            this.onChangeInput(event.target.value, 1)
+                        }
+                        error={loginError}
+                        disabled={fetchingLogin}
+                    />
+                    &lt;TextField
+                        id="outlined-password-input"
+                        placeholder={intl.formatMessage({
+                            id: 'password',
+                        })}
+                        className="password-textField"
+                        type="password"
+                        name="password"
+                        autoComplete="password"
+                        variant="outlined"
+                        margin="dense"
+                        onChange={event =>
+                            this.onChangeInput(event.target.value, 0)
+                        }
+                        error={loginError}
+                        disabled={fetchingLogin}
+                    />
+                    &lt;Button
+                        variant="contained"
+                        size="medium"
+                        color="secondary"
+                        className="submit-button"
+                        onClick={this.login}
+                        disabled={fetchingLogin}
+                        type="submit"
+                    >
+                        &lt;FormattedMessage id="connect" />
+                    &lt;/Button>
+                &lt;/form>
+            &lt;/div>
+        )
+    }
+}
+
+AccessForm.propTypes = {
+    loginRequest: PropTypes.func.isRequired,
+    fetchingLogin: PropTypes.bool,
+    intl: PropTypes.func.isRequired,
+}
+
+AccessForm.defaultProps = {
+    fetchingLogin: false,
+}
+
+const mapDispatchToProps = dispatch => ({
+    loginRequest: payload => dispatch(loginActions.loginRequest(payload)),
+})
+
+const mapStateToProps = state => ({
+    loginError: state.login.error,
+    fetchingLogin: state.login.loading,
+})
+
+export default compose(
+    connect(
+        mapStateToProps,
+        mapDispatchToProps
+    ),
+    injectIntl
+)(withRouter(AccessForm))
+</code></pre>
+                </article>
+            </section>
+        </div>
+
+        <nav>
+            <h2><a href="index.html">Home</a></h2>
+            <h3>Classes</h3>
+            <ul>
+                <li><a href="AccessForm.html">AccessForm</a></li>
+                <li><a href="AccessForm.AccessForm.html">AccessForm</a></li>
+                <li><a href="AddReferentiel.html">AddReferentiel</a></li>
+                <li>
+                    <a href="AddReferentiel.AddReferentiel.html"
+                        >AddReferentiel</a
+                    >
+                </li>
+                <li><a href="AddUniteRegionale.html">AddUniteRegionale</a></li>
+                <li>
+                    <a href="AddUniteRegionale.AddUniteRegionale.html"
+                        >AddUniteRegionale</a
+                    >
+                </li>
+                <li><a href="DemandeList.html">DemandeList</a></li>
+                <li><a href="DemandeList.DemandeList.html">DemandeList</a></li>
+                <li><a href="EditDemande.html">EditDemande</a></li>
+                <li><a href="EditDemande.EditDemande.html">EditDemande</a></li>
+                <li><a href="EditDemandFactory.html">EditDemandFactory</a></li>
+                <li><a href="ListReferentiels.html">ListReferentiels</a></li>
+                <li>
+                    <a href="ListReferentiels.ListReferentiels.html"
+                        >ListReferentiels</a
+                    >
+                </li>
+                <li>
+                    <a href="ListUniteRegionale.html">ListUniteRegionale</a>
+                </li>
+                <li>
+                    <a href="ListUniteRegionale.ListUniteRegionale.html"
+                        >ListUniteRegionale</a
+                    >
+                </li>
+                <li><a href="MapBlock.html">MapBlock</a></li>
+                <li><a href="Index.html">Index</a></li>
+                <li><a href="Index.Index.html">Index</a></li>
+                <li><a href="Signup.html">Signup</a></li>
+                <li><a href="Signup.Signup.html">Signup</a></li>
+            </ul>
+            <h3>Global</h3>
+            <ul>
+                <li><a href="global.html#DateExam">DateExam</a></li>
+            </ul>
+        </nav>
+
+        <br class="clear" />
+
+        <footer>
+            Documentation generated by
+            <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.3</a> on Thu Sep
+            19 2019 10:07:37 GMT+0100 (GMT+01:00)
+        </footer>
+
+        <script>
+            prettyPrint()
+        </script>
+        <script src="scripts/linenumber.js"></script>
+    </body>
+</html>

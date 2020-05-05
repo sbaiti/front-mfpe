@@ -1,0 +1,978 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <title>JSDoc: Source: screens/signup/index.jsx</title>
+
+        <script src="scripts/prettify/prettify.js"></script>
+        <script src="scripts/prettify/lang-css.js"></script>
+        <!--[if lt IE 9]>
+            <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+        <![endif]-->
+        <link
+            type="text/css"
+            rel="stylesheet"
+            href="styles/prettify-tomorrow.css"
+        />
+        <link
+            type="text/css"
+            rel="stylesheet"
+            href="styles/jsdoc-default.css"
+        />
+    </head>
+
+    <body>
+        <div id="main">
+            <h1 class="page-title">Source: screens/signup/index.jsx</h1>
+
+            <section>
+                <article>
+                    <pre
+                        class="prettyprint source linenums"
+                    ><code>/* eslint-disable radix */
+import React from 'react'
+import FormGroup from '@material-ui/core/FormGroup'
+import {
+    Grid,
+    Paper,
+    Table,
+    TableBody,
+    TableRow,
+    TableCell,
+} from '@material-ui/core'
+import { FormattedMessage, injectIntl } from 'react-intl'
+import PropTypes from 'prop-types'
+import { connect } from 'react-redux'
+import styled from 'styled-components'
+
+import InputText from '../../components/ui/input'
+import SelectList from '../../components/ui/select'
+import DateField from '../../components/ui/datePicker'
+import RadioField from '../../components/ui/radio'
+import generateKey, { formatDate } from '../../shared/utility'
+import ButtonComponent from '../../components/ui/button'
+import addUserActions from '../../redux/user/addUser'
+import getPdfLinkActions from '../../redux/pdf/getPdfLink'
+import inscription from '../../assets/images/inscription.svg'
+import getAllReferenceActions from '../../redux/referencial/getAllReferencial'
+import alertActions from '../../redux/alert'
+
+const WrapBgImage = styled.div`
+    padding: 30px;
+    display: inline-block;
+    background-image: url(${props => props.bg});
+    background-repeat: no-repeat;
+    background-position: 50%;
+    background-size: 150%;
+    width: 100%;
+`
+const WrapBgColor = styled.div`
+    background-image: radial-gradient(circle, white, #e8e8e8, #e6e6e6);
+    width: 100%;
+`
+/**
+ * Signup Component
+ *
+ * @class Signup
+ * @extends {React.Component}
+ */
+class Signup extends React.Component {
+    /**
+     * ProtoTypes
+     *
+     * @static
+     * @memberof Signup
+     */
+    static propTypes = {
+        intl: PropTypes.object.isRequired,
+        language: PropTypes.string.isRequired,
+        signup: PropTypes.func.isRequired,
+        allReferenciels: PropTypes.object,
+        response: PropTypes.object,
+        pdfData: PropTypes.object,
+        error: PropTypes.bool,
+        getPdfLink: PropTypes.func.isRequired,
+        history: PropTypes.object.isRequired,
+    }
+
+    /**
+     * Default Props
+     *
+     * @static
+     * @memberof Signup
+     */
+    static defaultProps = {
+        allReferenciels: {},
+        response: null,
+        pdfData: null,
+        error: false,
+    }
+
+    /**
+     * Creates an instance of Signup.
+     * @param {*} props
+     * @memberof Signup
+     */
+    constructor(props) {
+        super(props)
+        this.state = {
+            disable: false,
+            disablePrint: false,
+            isError: false,
+            errorsList: {},
+            submitted: false,
+            show: false,
+            showRedirectToHome: false,
+        }
+        this.payload = {
+            date_delivrance_cin: formatDate(new Date()),
+            date_delivrance_passport: formatDate(new Date()),
+            date_validite_sejour: formatDate(new Date()),
+            date_naissance: formatDate(new Date()),
+            inscrDate: formatDate(new Date()),
+            nationalite: '',
+            num_cin: '',
+            num_passport: '',
+            num_carte_sejour: '',
+            nom: '',
+            prenom: '',
+            gouvernorat: '',
+            delegation: '',
+            lieu_naissance: '',
+            tel: '',
+            email: '',
+            sexe: '',
+            personne_besoin_specifique: '0',
+            nature_besoin_specifique: '',
+            niveau_etude: '',
+            preview: 'false',
+            language: props.language,
+        }
+    }
+
+    /**
+     * Component will receive props
+     *
+     * @param {*} nextProps
+     * @memberof Signup
+     */
+    componentWillReceiveProps(nextProps) {
+        const { language, response } = this.props
+        if (nextProps.error &amp;&amp; nextProps.response) {
+            const errorsList = {}
+            try {
+                Object.keys(nextProps.response.data.data).forEach(key => {
+                    const item = nextProps.response.data.data[key]
+                    if (item) {
+                        const errorText = item[language]
+                        errorsList[key] = errorText
+                    }
+                })
+            } catch (e) {
+                console.log(e)
+            }
+            this.setState({ isError: true, errorsList })
+        }
+        if (
+            !nextProps.error &amp;&amp;
+            (nextProps.response || {}).data !== (response || {}).data
+        ) {
+            if (this.payload.preview === 'true') {
+                this.setState({ show: true })
+            }
+            if (nextProps.response &amp;&amp; this.payload.preview === 'false') {
+                this.setState({ submitted: true })
+                this.payload.preview = 'true'
+            }
+        }
+        if (
+            (nextProps.error &amp;&amp; nextProps.response) ||
+            (!nextProps.error &amp;&amp; nextProps.response)
+        ) {
+            this.setState({ disable: false })
+        }
+        if (nextProps.pdfData) {
+            this.setState({ disablePrint: false })
+        }
+    }
+
+    /**
+     * Render Form
+     *
+     * @memberof Signup
+     */
+    renderForm = () => {
+        const {
+            allReferenciels,
+            intl,
+            language,
+            // getAllReferentiels,
+        } = this.props
+        let listGov = []
+        let listDeleg = []
+        let listNiv = []
+        let listNature = []
+        let listNatio = []
+
+        try {
+            listGov = allReferenciels.referenciels.RefGouvernorat.map(i => ({
+                label: language === 'ar' ? i.intituleAr : i.intituleFr,
+                value: i.id,
+            }))
+            listDeleg = allReferenciels.referenciels.RefDelegation.filter(
+                e => e.parent &amp;&amp; e.parent.id === this.payload.gouvernorat
+            ).map(i => ({
+                label: language === 'ar' ? i.intituleAr : i.intituleFr,
+                value: i.id,
+            }))
+            listNiv = allReferenciels.referenciels.RefNiveauEtude.map(i => ({
+                label: language === 'ar' ? i.intituleAr : i.intituleFr,
+                value: i.id,
+            }))
+            listNature = allReferenciels.referenciels.RefNatureBesoinSpecifique.map(
+                i => ({
+                    label: language === 'ar' ? i.intituleAr : i.intituleFr,
+                    value: i.id,
+                })
+            )
+            listNatio = allReferenciels.referenciels.RefNationalite.map(i => {
+                if (
+                    i.intituleFr
+                        .toLowerCase()
+                        .trim()
+                        .indexOf('tun') === 0
+                )
+                    this.tunNatioId = i.id
+                return {
+                    label: language === 'ar' ? i.intituleAr : i.intituleFr,
+                    value: i.id,
+                }
+            })
+        } catch (error) {
+            console.log(error)
+            // getAllReferentiels()
+            // return
+        }
+
+        const listSexe = [
+            { label: language === 'ar' ? 'ذكر' : 'Homme', value: 'Homme' },
+            { label: language === 'ar' ? 'انثي' : 'Femme', value: 'Femme' },
+        ]
+        const listBesoin = [
+            { label: language === 'ar' ? 'نعم' : 'Oui', value: '1' },
+            { label: language === 'ar' ? 'لا' : 'Non', value: '0' },
+        ]
+        const formElments = [
+            {
+                name: 'nationalite',
+                label: &lt;FormattedMessage id="nationality" />,
+                list: listNatio,
+                isSelect: true,
+            },
+            this.payload.nationalite === this.tunNatioId &amp;&amp; {
+                name: 'num_cin',
+                label: &lt;FormattedMessage id="cin" />,
+                placeholder: intl.formatMessage({ id: 'cin' }),
+                type: 'number',
+            },
+            this.payload.nationalite &amp;&amp;
+                this.payload.nationalite !== this.tunNatioId &amp;&amp; {
+                    name: 'num_passport',
+                    label: &lt;FormattedMessage id="passport" />,
+                    placeholder: intl.formatMessage({
+                        id: 'passport',
+                    }),
+                    // type: 'number',
+                },
+            this.payload.nationalite === this.tunNatioId &amp;&amp; {
+                name: 'date_delivrance_cin',
+                label: &lt;FormattedMessage id="issueDate" />,
+                isDate: true,
+            },
+            this.payload.nationalite &amp;&amp;
+                this.payload.nationalite !== this.tunNatioId &amp;&amp; {
+                    name: 'date_delivrance_passport',
+                    label: &lt;FormattedMessage id="issueDate" />,
+                    isDate: true,
+                },
+            this.payload.nationalite &amp;&amp;
+                this.payload.nationalite !== this.tunNatioId &amp;&amp; {
+                    name: 'date_validite_sejour',
+                    label: &lt;FormattedMessage id="validityStayDate" />,
+                    isDate: true,
+                    props: {
+                        disableFuture: false,
+                    },
+                },
+            this.payload.nationalite &amp;&amp;
+                this.payload.nationalite !== this.tunNatioId &amp;&amp; {
+                    name: 'num_carte_sejour',
+                    label: &lt;FormattedMessage id="residenceCardNumber" />,
+                    placeholder: intl.formatMessage({
+                        id: 'residenceCardNumber',
+                    }),
+                    type: 'number',
+                },
+            {
+                name: 'prenom',
+                label: &lt;FormattedMessage id="lastName" />,
+                placeholder: intl.formatMessage({ id: 'lastName' }),
+            },
+            {
+                name: 'nom',
+                label: &lt;FormattedMessage id="firstName" />,
+                placeholder: intl.formatMessage({ id: 'firstName' }),
+            },
+            {
+                name: 'date_naissance',
+                label: &lt;FormattedMessage id="birthDate" />,
+                isDate: true,
+            },
+            {
+                name: 'lieu_naissance',
+                label: &lt;FormattedMessage id="birthPlace" />,
+                placeholder: intl.formatMessage({ id: 'birthPlace' }),
+            },
+            {
+                name: 'gouvernorat',
+                label: &lt;FormattedMessage id="governorate" />,
+                list: listGov,
+                isSelect: true,
+            },
+            {
+                name: 'delegation',
+                label: &lt;FormattedMessage id="delegation" />,
+                list: listDeleg,
+                isSelect: true,
+            },
+            {
+                name: 'tel',
+                label: &lt;FormattedMessage id="phone" />,
+                placeholder: intl.formatMessage({ id: 'phone' }),
+                type: 'tel',
+            },
+            {
+                name: 'email',
+                label: &lt;FormattedMessage id="email" />,
+                placeholder: intl.formatMessage({ id: 'email' }),
+                type: 'email',
+            },
+            {
+                name: 'sexe',
+                label: &lt;FormattedMessage id="sex" />,
+                list: listSexe,
+                isRadio: true,
+            },
+            {
+                name: 'personne_besoin_specifique',
+                label: &lt;FormattedMessage id="personWithSpecialNeeds" />,
+                list: listBesoin,
+                isRadio: true,
+            },
+            {
+                name: 'niveau_etude',
+                label: &lt;FormattedMessage id="studyLevel" />,
+                list: listNiv,
+                isSelect: true,
+            },
+            parseInt(this.payload.personne_besoin_specifique) === 1 &amp;&amp; {
+                name: 'nature_besoin_specifique',
+                label: &lt;FormattedMessage id="specialNeedsNature" />,
+                list: listNature,
+                isSelect: true,
+            },
+            {
+                name: 'inscrDate',
+                label: &lt;FormattedMessage id="registrationDate" />,
+                isDate: true,
+                props: { disabled: true },
+            },
+        ]
+        const { isError, errorsList } = this.state
+        return formElments.map(
+            el =>
+                el &amp;&amp; (
+                    &lt;Grid
+                        item
+                        xs={12}
+                        sm={6}
+                        key={generateKey()}
+                        className="gridItem"
+                    >
+                        {el.isSelect ? (
+                            &lt;SelectList
+                                onchange={e => {
+                                    this.fieldChangedHandler(e, el.name)
+                                    this.update(el.name)
+                                }}
+                                name={el.name}
+                                label={el.label}
+                                list={el.list}
+                                selectedItem={this.payload[el.name]}
+                                errorText={errorsList[el.name]}
+                                isError={
+                                    isError &amp;&amp;
+                                    Object.keys(errorsList).includes(el.name)
+                                }
+                            />
+                        ) : el.isRadio ? (
+                            &lt;RadioField
+                                onchange={e => {
+                                    this.fieldChangedHandler(e, el.name)
+                                    this.update(el.name)
+                                }}
+                                name={el.name}
+                                label={el.label}
+                                list={el.list}
+                                chosenItem={this.payload[el.name]}
+                                errorText={errorsList[el.name]}
+                                isError={
+                                    isError &amp;&amp;
+                                    Object.keys(errorsList).includes(el.name)
+                                }
+                            />
+                        ) : el.isDate ? (
+                            &lt;DateField
+                                onchange={e =>
+                                    this.fieldChangedHandler(e, el.name)
+                                }
+                                name={el.name}
+                                label={el.label}
+                                placeholder={el.placeholder}
+                                isArabic={language === 'ar'}
+                                defaultValue={new Date(this.payload[el.name])}
+                                errorText={errorsList[el.name]}
+                                isError={
+                                    isError &amp;&amp;
+                                    Object.keys(errorsList).includes(el.name)
+                                }
+                                attributes={el.props}
+                            />
+                        ) : (
+                            &lt;InputText
+                                onchange={e =>
+                                    this.fieldChangedHandler(e, el.name)
+                                }
+                                name={el.name}
+                                label={el.label}
+                                placeholder={el.placeholder}
+                                type={el.type}
+                                value={this.payload[el.name]}
+                                errorText={errorsList[el.name]}
+                                isError={
+                                    isError &amp;&amp;
+                                    Object.keys(errorsList).includes(el.name)
+                                }
+                            />
+                        )}
+                    &lt;/Grid>
+                )
+        )
+    }
+
+    /**
+     * Render Details
+     *
+     * @memberof Signup
+     */
+    renderDetails = () => {
+        const { language, allReferenciels } = this.props
+        const lang = language === 'ar' ? 'intituleAr' : 'intituleFr'
+
+        const GOV =
+            allReferenciels.referenciels.RefGouvernorat.find(
+                i => i.id === parseInt(this.payload.gouvernorat)
+            ) || {}
+        const DELEG =
+            allReferenciels.referenciels.RefDelegation.find(
+                e => e.id === parseInt(this.payload.delegation)
+            ) || {}
+        const NIV =
+            allReferenciels.referenciels.RefNiveauEtude.find(
+                i => i.id === parseInt(this.payload.niveau_etude)
+            ) || {}
+        const NATURE =
+            allReferenciels.referenciels.RefNatureBesoinSpecifique.find(
+                i => i.id === this.payload.nature_besoin_specifique
+            ) || {}
+        const NATIO =
+            allReferenciels.referenciels.RefNationalite.find(
+                i => i.id === this.payload.nationalite
+            ) || {}
+
+        return (
+            &lt;Paper id="divToPrint" style={{ width: '100%' }}>
+                &lt;Table>
+                    &lt;TableBody>
+                        &lt;TableRow>
+                            &lt;TableCell>
+                                &lt;FormattedMessage id="citizen" />
+                            &lt;/TableCell>
+                            &lt;TableCell>
+                                {`${this.payload.prenom} ${this.payload.nom}`}
+                            &lt;/TableCell>
+                        &lt;/TableRow>
+                        &lt;TableRow>
+                            &lt;TableCell>
+                                &lt;FormattedMessage id="registrationDate" />
+                            &lt;/TableCell>
+                            &lt;TableCell>
+                                {this.payload.inscrDate
+                                    .split('-')
+                                    .reverse()
+                                    .join('-')}
+                            &lt;/TableCell>
+                        &lt;/TableRow>
+                        &lt;TableRow>
+                            &lt;TableCell>
+                                &lt;FormattedMessage id="nationality" />
+                            &lt;/TableCell>
+                            &lt;TableCell>{NATIO[lang]}&lt;/TableCell>
+                        &lt;/TableRow>
+                        {parseInt(this.payload.nationalite)
+                            ? parseInt(this.payload.nationalite) ===
+                              parseInt(this.tunNatioId)
+                                ? [
+                                      &lt;TableRow key="a">
+                                          &lt;TableCell>
+                                              &lt;FormattedMessage id="cin" />
+                                          &lt;/TableCell>
+                                          &lt;TableCell>
+                                              {this.payload.num_cin}
+                                          &lt;/TableCell>
+                                      &lt;/TableRow>,
+                                      &lt;TableRow key="b">
+                                          &lt;TableCell>
+                                              &lt;FormattedMessage id="issueDate" />
+                                          &lt;/TableCell>
+                                          &lt;TableCell>
+                                              {this.payload.date_delivrance_cin
+                                                  .split('-')
+                                                  .reverse()
+                                                  .join('-')}
+                                          &lt;/TableCell>
+                                      &lt;/TableRow>,
+                                  ]
+                                : [
+                                      &lt;TableRow key="a">
+                                          &lt;TableCell>
+                                              &lt;FormattedMessage id="passport" />
+                                          &lt;/TableCell>
+                                          &lt;TableCell>
+                                              {this.payload.num_passport}
+                                          &lt;/TableCell>
+                                      &lt;/TableRow>,
+                                      &lt;TableRow key="b">
+                                          &lt;TableCell>
+                                              &lt;FormattedMessage id="issueDate" />
+                                          &lt;/TableCell>
+                                          &lt;TableCell>
+                                              {this.payload.date_delivrance_passport
+                                                  .split('-')
+                                                  .reverse()
+                                                  .join('-')}
+                                          &lt;/TableCell>
+                                      &lt;/TableRow>,
+                                      &lt;TableRow key="c">
+                                          &lt;TableCell>
+                                              &lt;FormattedMessage id="residenceCardNumber" />
+                                          &lt;/TableCell>
+                                          &lt;TableCell>
+                                              {this.payload.num_carte_sejour}
+                                          &lt;/TableCell>
+                                      &lt;/TableRow>,
+                                      &lt;TableRow key="d">
+                                          &lt;TableCell>
+                                              &lt;FormattedMessage id="validityStayDate" />
+                                          &lt;/TableCell>
+                                          &lt;TableCell>
+                                              {this.payload.date_validite_sejour
+                                                  .split('-')
+                                                  .reverse()
+                                                  .join('-')}
+                                          &lt;/TableCell>
+                                      &lt;/TableRow>,
+                                  ]
+                            : null}
+                        &lt;TableRow>
+                            &lt;TableCell>
+                                &lt;FormattedMessage id="birthDate" />
+                            &lt;/TableCell>
+                            &lt;TableCell>
+                                {this.payload.date_naissance
+                                    .split('-')
+                                    .reverse()
+                                    .join('-')}
+                            &lt;/TableCell>
+                        &lt;/TableRow>
+                        &lt;TableRow>
+                            &lt;TableCell>
+                                &lt;FormattedMessage id="birthPlace" />
+                            &lt;/TableCell>
+                            &lt;TableCell>{this.payload.lieu_naissance}&lt;/TableCell>
+                        &lt;/TableRow>
+                        &lt;TableRow>
+                            &lt;TableCell>
+                                &lt;FormattedMessage id="governorate" />
+                            &lt;/TableCell>
+                            &lt;TableCell>{GOV[lang]}&lt;/TableCell>
+                        &lt;/TableRow>
+                        &lt;TableRow>
+                            &lt;TableCell>
+                                &lt;FormattedMessage id="delegation" />
+                            &lt;/TableCell>
+                            &lt;TableCell>{DELEG[lang]}&lt;/TableCell>
+                        &lt;/TableRow>
+                        &lt;TableRow>
+                            &lt;TableCell>
+                                &lt;FormattedMessage id="phone" />
+                            &lt;/TableCell>
+                            &lt;TableCell>{this.payload.tel}&lt;/TableCell>
+                        &lt;/TableRow>
+                        &lt;TableRow>
+                            &lt;TableCell>
+                                &lt;FormattedMessage id="email" />
+                            &lt;/TableCell>
+                            &lt;TableCell>{this.payload.email}&lt;/TableCell>
+                        &lt;/TableRow>
+                        &lt;TableRow>
+                            &lt;TableCell>
+                                &lt;FormattedMessage id="sex" />
+                            &lt;/TableCell>
+                            &lt;TableCell>{this.payload.sexe}&lt;/TableCell>
+                        &lt;/TableRow>
+                        &lt;TableRow>
+                            &lt;TableCell>
+                                &lt;FormattedMessage id="studyLevel" />
+                            &lt;/TableCell>
+                            &lt;TableCell>{NIV[lang]}&lt;/TableCell>
+                        &lt;/TableRow>
+                        &lt;TableRow>
+                            &lt;TableCell>
+                                &lt;FormattedMessage id="personWithSpecialNeeds" />
+                            &lt;/TableCell>
+                            &lt;TableCell>
+                                {parseInt(
+                                    this.payload.personne_besoin_specifique
+                                ) !== 0 ? (
+                                    &lt;FormattedMessage id="yes" />
+                                ) : (
+                                    &lt;FormattedMessage id="no" />
+                                )}
+                            &lt;/TableCell>
+                        &lt;/TableRow>
+                        {parseInt(this.payload.personne_besoin_specifique) !==
+                            0 &amp;&amp; (
+                            &lt;TableRow key="a">
+                                &lt;TableCell>
+                                    &lt;FormattedMessage id="specialNeedsNature" />
+                                &lt;/TableCell>
+                                &lt;TableCell>{NATURE[lang]}&lt;/TableCell>
+                            &lt;/TableRow>
+                        )}
+                    &lt;/TableBody>
+                &lt;/Table>
+            &lt;/Paper>
+        )
+    }
+
+    /**
+     * Field chnaged handler
+     *
+     * @param {object} e
+     * @param {string} name
+     * @memberof Signup
+     */
+    fieldChangedHandler = (e, name) => {
+        if (name === 'num_cin') {
+            e.target.value = e.target.value.toString().slice(0, 8)
+        }
+        if (name === 'tel') {
+            e.target.value = e.target.value.toString().slice(0, 12)
+        }
+        this.payload[name] = e.target.value
+    }
+
+    /**
+     * Update
+     *
+     * @param {integer} key
+     * @memberof Signup
+     */
+    update = key => {
+        if (
+            [
+                'nationalite',
+                'personne_besoin_specifique',
+                'gouvernorat',
+            ].indexOf(key) > -1
+        )
+            this.forceUpdate()
+        switch (key) {
+            case 'personne_besoin_specifique':
+                this.payload.nature_besoin_specifique = ''
+                break
+            case 'gouvernorat':
+                this.payload.delegation = ''
+                break
+            case 'nationalite':
+                this.payload.num_cin = ''
+                this.payload.num_passport = ''
+                this.payload.num_carte_sejour = ''
+                this.payload.date_delivrance_cin = formatDate(new Date())
+                this.payload.date_delivrance_passport = formatDate(new Date())
+                this.payload.date_validite_sejour = formatDate(new Date())
+                break
+
+            default:
+                break
+        }
+    }
+
+    /**
+     * Add User
+     *
+     * @memberof Signup
+     */
+    addUser = () => {
+        const { signup } = this.props
+        const newPayload = {
+            ...this.payload,
+            nationalite: { id: this.payload.nationalite },
+            gouvernorat: { id: this.payload.gouvernorat },
+            delegation: { id: this.payload.delegation },
+            niveau_etude: { id: this.payload.niveau_etude },
+            nature_besoin_specifique: {
+                id: this.payload.nature_besoin_specifique,
+            },
+            personne_besoin_specifique:
+                parseInt(this.payload.personne_besoin_specifique) || 0,
+            tel: this.payload.tel.replace('+', '00'),
+        }
+        this.setState({ disable: true })
+
+        signup(newPayload)
+    }
+
+    /**
+     * Print
+     *
+     * @memberof Signup
+     */
+    print = () => {
+        const { getPdfLink, language } = this.props
+        this.setState({ showRedirectToHome: true, disablePrint: true })
+        getPdfLink({ email: this.payload.email, lang: language })
+    }
+
+    /**
+     * Render
+     *
+     * @returns
+     * @memberof Signup
+     */
+    render() {
+        const { allReferenciels, history } = this.props
+        const {
+            submitted,
+            show,
+            showRedirectToHome,
+            disable,
+            disablePrint,
+        } = this.state
+        return (
+            &lt;WrapBgColor key={generateKey()} bg={inscription}>
+                &lt;WrapBgImage key={generateKey()} bg={inscription}>
+                    {allReferenciels &amp;&amp; (
+                        &lt;FormGroup style={{ background: '#e6e6e670' }}>
+                            &lt;div className="centerDiv">
+                                &lt;Grid container>
+                                    {submitted
+                                        ? this.renderDetails()
+                                        : this.renderForm()}
+                                &lt;/Grid>
+                                &lt;div
+                                    style={{ textAlign: 'center', padding: 20 }}
+                                >
+                                    {!show &amp;&amp; (
+                                        &lt;ButtonComponent
+                                            disabled={disable}
+                                            color="secondary"
+                                            type="contained"
+                                            label={
+                                                &lt;FormattedMessage id="cancel" />
+                                            }
+                                            size="large"
+                                            clicked={() => {
+                                                if (submitted) {
+                                                    this.payload.preview =
+                                                        'false'
+                                                    this.setState({
+                                                        submitted: false,
+                                                        show: false,
+                                                    })
+                                                } else history.goBack()
+                                            }}
+                                        />
+                                    )}
+                                    {!submitted &amp;&amp; (
+                                        &lt;ButtonComponent
+                                            disabled={disable}
+                                            color="secondary"
+                                            type="contained"
+                                            size="large"
+                                            label={
+                                                &lt;FormattedMessage id="save" />
+                                            }
+                                            clicked={this.addUser}
+                                        />
+                                    )}
+                                    {submitted &amp;&amp; !show &amp;&amp; (
+                                        &lt;ButtonComponent
+                                            disabled={disable}
+                                            color="secondary"
+                                            type="contained"
+                                            size="large"
+                                            label={
+                                                &lt;FormattedMessage id="register" />
+                                            }
+                                            clicked={this.addUser}
+                                        />
+                                    )}
+                                    {show &amp;&amp; (
+                                        &lt;ButtonComponent
+                                            disabled={disablePrint || disable}
+                                            color="secondary"
+                                            type="contained"
+                                            size="large"
+                                            label={
+                                                &lt;FormattedMessage id="print" />
+                                            }
+                                            clicked={this.print}
+                                        />
+                                    )}
+                                    {showRedirectToHome &amp;&amp; (
+                                        &lt;ButtonComponent
+                                            disabled={disablePrint}
+                                            color="secondary"
+                                            type="contained"
+                                            size="large"
+                                            label={
+                                                &lt;FormattedMessage id="goHomePage" />
+                                            }
+                                            clicked={() => {
+                                                history.push('/home')
+                                            }}
+                                        />
+                                    )}
+                                &lt;/div>
+                            &lt;/div>
+                        &lt;/FormGroup>
+                    )}
+                &lt;/WrapBgImage>
+            &lt;/WrapBgColor>
+        )
+    }
+}
+
+const mapStateToProps = state => {
+    return {
+        language: state.info.language,
+        response: state.user.addUser.response,
+        error: state.user.addUser.error,
+        pdfData: state.pdf.pdfLink.response,
+        allReferenciels: state.referencial.allReferencials.response,
+    }
+}
+const mapDispatchToProps = dispatch => ({
+    signup: payload => dispatch(addUserActions.addUserRequest(payload)),
+    getPdfLink: payload =>
+        dispatch(getPdfLinkActions.getPdfLinkRequest(payload)),
+    getAllReferentiels: () =>
+        dispatch(getAllReferenceActions.getAllReferenceRequest()),
+    alertShow: (show, info) =>
+        dispatch(
+            alertActions.alertShow(show, {
+                onConfirm: info.onConfirm,
+                warning: info.warning,
+                info: info.info,
+                error: info.error,
+                success: info.success,
+                message: info.message,
+                title: info.title,
+            })
+        ),
+})
+
+export default connect(
+    mapStateToProps,
+    mapDispatchToProps
+)(injectIntl(Signup))
+</code></pre>
+                </article>
+            </section>
+        </div>
+
+        <nav>
+            <h2><a href="index.html">Home</a></h2>
+            <h3>Classes</h3>
+            <ul>
+                <li><a href="AccessForm.html">AccessForm</a></li>
+                <li><a href="AccessForm.AccessForm.html">AccessForm</a></li>
+                <li><a href="AddReferentiel.html">AddReferentiel</a></li>
+                <li>
+                    <a href="AddReferentiel.AddReferentiel.html"
+                        >AddReferentiel</a
+                    >
+                </li>
+                <li><a href="AddUniteRegionale.html">AddUniteRegionale</a></li>
+                <li>
+                    <a href="AddUniteRegionale.AddUniteRegionale.html"
+                        >AddUniteRegionale</a
+                    >
+                </li>
+                <li><a href="DemandeList.html">DemandeList</a></li>
+                <li><a href="DemandeList.DemandeList.html">DemandeList</a></li>
+                <li><a href="EditDemande.html">EditDemande</a></li>
+                <li><a href="EditDemande.EditDemande.html">EditDemande</a></li>
+                <li><a href="EditDemandFactory.html">EditDemandFactory</a></li>
+                <li><a href="ListReferentiels.html">ListReferentiels</a></li>
+                <li>
+                    <a href="ListReferentiels.ListReferentiels.html"
+                        >ListReferentiels</a
+                    >
+                </li>
+                <li>
+                    <a href="ListUniteRegionale.html">ListUniteRegionale</a>
+                </li>
+                <li>
+                    <a href="ListUniteRegionale.ListUniteRegionale.html"
+                        >ListUniteRegionale</a
+                    >
+                </li>
+                <li><a href="MapBlock.html">MapBlock</a></li>
+                <li><a href="Index.html">Index</a></li>
+                <li><a href="Index.Index.html">Index</a></li>
+                <li><a href="Signup.html">Signup</a></li>
+                <li><a href="Signup.Signup.html">Signup</a></li>
+            </ul>
+            <h3>Global</h3>
+            <ul>
+                <li><a href="global.html#DateExam">DateExam</a></li>
+            </ul>
+        </nav>
+
+        <br class="clear" />
+
+        <footer>
+            Documentation generated by
+            <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.3</a> on Thu Sep
+            19 2019 10:07:37 GMT+0100 (GMT+01:00)
+        </footer>
+
+        <script>
+            prettyPrint()
+        </script>
+        <script src="scripts/linenumber.js"></script>
+    </body>
+</html>

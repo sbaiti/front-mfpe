@@ -1,0 +1,219 @@
+.method-draw {
+    @include keyframes(slideIn) {
+        0% {
+            opacity: 0;
+        }
+
+        50% {
+            opacity: 0.5;
+        }
+
+        100% {
+            opacity: 1;
+        }
+    }
+
+    @include keyframes(opacityIn) {
+        0% {
+            opacity: 0;
+        }
+
+        50% {
+            opacity: 0.5;
+        }
+
+        100% {
+            opacity: 1;
+        }
+    }
+
+    .st0 {
+        fill: $yellow-tint-500;
+    }
+
+    .st1 {
+        fill: $white;
+    }
+
+    .st2 {
+        fill: $blue-tint-1000;
+    }
+
+    .st3 {
+        fill: $green-tint-500;
+    }
+
+    .st4 {
+        fill: $pink-tint-500;
+    }
+
+    .st5 {
+        fill: $mauve-tint-500;
+    }
+
+    .st6 {
+        fill-rule: evenodd;
+        clip-rule: evenodd;
+        fill: $white;
+    }
+
+    .st7 {
+        fill: $blue-tint-900;
+    }
+
+    .st8 {
+        fill: $white;
+    }
+
+    $triangleItems: (
+        '#formation',
+        '#région',
+        '#socio-économique',
+        '#emploi',
+        '#Attestations',
+        '#projets'
+    );
+
+    @each $identifier in $triangleItems {
+        #{$identifier} {
+            cursor: pointer;
+            opacity: 0;
+            &:hover {
+                opacity: 0.5;
+            }
+        }
+        g {
+            &#{$identifier} {
+                transition: all 0.2s ease-in-out;
+            }
+
+            @if $identifier== '#région' {
+                &#{$identifier} {
+                    @include animation(500ms, 1s, opacityIn);
+                    &:hover {
+                        transform: translate(0, -4%);
+                    }
+                }
+            } @else if $identifier== '#socio-économique' {
+                &#{$identifier} {
+                    @include animation(1s, 1s, opacityIn);
+                    &:hover {
+                        transform: translate(4%, -4%);
+                    }
+                }
+            } @else if $identifier== '#projets' {
+                &#{$identifier} {
+                    @include animation(1500ms, 1s, opacityIn);
+                    &:hover {
+                        transform: translate(4%, 4%);
+                    }
+                }
+            } @else if $identifier== '#Attestations' {
+                &#{$identifier} {
+                    @include animation(2000ms, 1s, opacityIn);
+                    &:hover {
+                        transform: translate(0, 4%);
+                    }
+                }
+            } @else if $identifier== '#emploi' {
+                &#{$identifier} {
+                    @include animation(2500ms, 1s, opacityIn);
+                    &:hover {
+                        transform: translate(-4%, 4%);
+                    }
+                }
+            } @else if $identifier== '#formation' {
+                &#{$identifier} {
+                    @include animation(3000ms, 1s, opacityIn);
+                    &:hover {
+                        transform: translate(-4%, -4%);
+                    }
+                }
+            }
+        }
+    }
+
+    * {
+        &:focus {
+            outline: 0;
+        }
+    }
+}
+
+.content-panel {
+    button {
+        &:hover {
+            color: white !important;
+            border-color: transparent !important;
+            background-color: rgba(0, 0, 0, 0.5) !important;
+        }
+
+        &:focus {
+            border-color: transparent !important;
+        }
+    }
+
+    $contents: 'simple-ContentPanel-0' $yellow-shades-500 $yellow-tint-500,
+        'simple-ContentPanel-1' $blue-shades-800 $blue-tint-1000,
+        'simple-ContentPanel-2' $green-shades-500 $green-tint-500,
+        'simple-ContentPanel-3' $pink-shades-500 $pink-tint-500,
+        'simple-ContentPanel-4' $mauve-shades-500 $mauve-tint-500,
+        'simple-ContentPanel-5' $blue-shades-900 $blue-tint-900;
+
+    @each $className, $shades, $tint in $contents {
+        &##{$className} {
+            background-color: $tint;
+            h6 {
+                color: $shades;
+            }
+            button {
+                background-color: $shades;
+            }
+        }
+    }
+}
+
+$triangleItems: (
+    'selected-0': '#formation',
+    'selected-1': '#région',
+    'selected-2': '#socio-économique',
+    'selected-3': '#emploi',
+    'selected-4': '#Attestations',
+    'selected-5': '#projets',
+);
+
+@each $name, $identifier in $triangleItems {
+    .#{$name} {
+        g {
+            &#{$identifier} {
+                transition: all 0.2s ease-in-out;
+            }
+
+            @if $identifier== '#région' {
+                &#{$identifier} {
+                    transform: translate(0, -4%);
+                }
+            } @else if $identifier== '#socio-économique' {
+                &#{$identifier} {
+                    transform: translate(4%, -4%);
+                }
+            } @else if $identifier== '#projets' {
+                &#{$identifier} {
+                    transform: translate(4%, 4%);
+                }
+            } @else if $identifier== '#Attestations' {
+                &#{$identifier} {
+                    transform: translate(0, 4%);
+                }
+            } @else if $identifier== '#emploi' {
+                &#{$identifier} {
+                    transform: translate(-4%, 4%);
+                }
+            } @else if $identifier== '#formation' {
+                &#{$identifier} {
+                    transform: translate(-4%, -4%);
+                }
+            }
+        }
+    }
+}

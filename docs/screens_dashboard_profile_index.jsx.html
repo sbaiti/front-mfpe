@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <title>JSDoc: Source: screens/dashboard/profile/index.jsx</title>
+
+        <script src="scripts/prettify/prettify.js"></script>
+        <script src="scripts/prettify/lang-css.js"></script>
+        <!--[if lt IE 9]>
+            <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+        <![endif]-->
+        <link
+            type="text/css"
+            rel="stylesheet"
+            href="styles/prettify-tomorrow.css"
+        />
+        <link
+            type="text/css"
+            rel="stylesheet"
+            href="styles/jsdoc-default.css"
+        />
+    </head>
+
+    <body>
+        <div id="main">
+            <h1 class="page-title">
+                Source: screens/dashboard/profile/index.jsx
+            </h1>
+
+            <section>
+                <article>
+                    <pre
+                        class="prettyprint source linenums"
+                    ><code>/* eslint-disable no-nested-ternary */
+/* eslint-disable no-unused-vars */
+/* eslint-disable react/forbid-prop-types */
+import React from 'react'
+import MaterialTable from 'material-table'
+import { injectIntl, FormattedMessage } from 'react-intl'
+import PropTypes from 'prop-types'
+import { connect } from 'react-redux'
+import editUserActions from '../../../redux/user/editUser'
+import getAllReferenceActions from '../../../redux/referencial/getAllReferencial'
+
+/**
+ *
+ * @class Index
+ * @extends {React.Component}
+ */
+class Index extends React.Component {
+    /**
+     * Creates an instance of Index.
+     * @param {*} props
+     * @memberof Index
+     */
+    constructor(props) {
+        super(props)
+        this.state = {
+            showAlert: false,
+            err: false,
+            msgErr: '',
+        }
+    }
+
+    /**
+     * componentWillReceiveProps
+     *
+     * @param {*} nextProps
+     * @memberof Index
+     */
+    componentWillReceiveProps(nextProps) {
+        const { error, success, response, intl, language } = nextProps
+        const { success: successProps, error: errorProps } = this.props
+        if (error &amp;&amp; error !== errorProps &amp;&amp; response.data.data) {
+            this.setState({
+                showAlert: true,
+                err: true,
+                msgErr: this.getMsgResponse(language, response),
+            })
+        }
+        if (success &amp;&amp; success !== successProps) {
+            this.setState({
+                showAlert: true,
+                err: false,
+                msgErr: intl.formatMessage({ id: 'editSuccess' }),
+            })
+        }
+    }
+
+    /**
+     * Payload
+     *
+     * @memberof Index
+     * @return {object}
+     */
+    payload = () => {
+        const { intl, userDetails } = this.props
+        return {
+            columns: [
+                {
+                    title: 'text',
+                    field: 'text',
+                    editable: 'never',
+                    cellStyle: { textAlign: 'inherit', fontWeight: 'bold' },
+                },
+                {
+                    title: 'value',
+                    field: 'value',
+                    cellStyle: { textAlign: 'inherit' },
+                },
+            ],
+            data: [
+                {
+                    name: 'prenomFr',
+                    text: intl.formatMessage({ id: 'lastName' }),
+                    value: userDetails.prenomFr,
+                },
+                {
+                    name: 'nomFr',
+                    text: intl.formatMessage({ id: 'firstName' }),
+                    value: userDetails.nomFr,
+                },
+                {
+                    name: 'email',
+                    text: intl.formatMessage({ id: 'email' }),
+                    value: userDetails.email,
+                },
+                {
+                    name: 'tel',
+                    text: intl.formatMessage({ id: 'phone' }),
+                    value: userDetails.tel,
+                },
+                {
+                    name: 'numCin',
+                    text: intl.formatMessage({ id: 'cin' }),
+                    value: userDetails.numCin,
+                },
+                {
+                    name: 'dateDelivranceCin',
+                    text: intl.formatMessage({ id: 'issueDate' }),
+                    value: this.formatDate(userDetails.dateDelivranceCin),
+                },
+                {
+                    name: 'numPassport',
+                    text: intl.formatMessage({ id: 'passport' }),
+                    value: userDetails.numPassport,
+                },
+                {
+                    name: 'dateDelivrancePassport',
+                    text: intl.formatMessage({ id: 'issueDate' }),
+                    value: this.formatDate(userDetails.dateDelivrancePassport),
+                },
+                {
+                    name: 'numCarteSejour',
+                    text: intl.formatMessage({ id: 'residenceCardNumber' }),
+                    value: userDetails.numCarteSejour,
+                },
+                {
+                    name: 'dateValiditeSejour',
+                    text: intl.formatMessage({
+                        id: 'validityStayDate',
+                    }),
+                    value: userDetails.dateValiditeSejour,
+                },
+                {
+                    name: 'nationalite',
+                    text: intl.formatMessage({ id: 'nationality' }),
+                    value: this.getTranslatedName(userDetails.nationalite),
+                },
+                {
+                    name: 'dateNaissance',
+                    text: intl.formatMessage({ id: 'birthDate' }),
+                    value: this.formatDate(userDetails.dateNaissance),
+                },
+                {
+                    name: 'lieuNaissance',
+                    text: intl.formatMessage({ id: 'birthPlace' }),
+                    value: userDetails.lieuNaissance,
+                },
+                {
+                    name: 'gouvernorat',
+                    text: intl.formatMessage({ id: 'governorate' }),
+                    value: this.getTranslatedName(userDetails.gouvernorat),
+                },
+                {
+                    name: 'delegation',
+                    text: intl.formatMessage({ id: 'delegation' }),
+                    value: this.getTranslatedName(userDetails.delegation),
+                },
+                {
+                    name: 'sexe',
+                    text: intl.formatMessage({ id: 'sex' }),
+                    value: userDetails.sexe,
+                },
+                {
+                    name: 'language',
+                    text: intl.formatMessage({ id: 'studyLevel' }),
+                    value: this.getTranslatedName(userDetails.niveauEtude),
+                },
+                {
+                    name: 'personneBesoinSpecifique',
+                    text: intl.formatMessage({
+                        id: 'personWithSpecialNeeds',
+                    }),
+                    value: userDetails.personneBesoinSpecifique
+                        ? intl.formatMessage({ id: 'yes' })
+                        : intl.formatMessage({ id: 'no' }),
+                },
+                {
+                    name: 'natureBesoinSpecifique',
+                    text: intl.formatMessage({
+                        id: 'specialNeedsNature',
+                    }),
+                    value: userDetails.natureBesoinSpecifique,
+                },
+            ],
+        }
+    }
+
+    /**
+     * Get translated name
+     *
+     * @param{object} name
+     * @memberof Index
+     *
+     *  @return {string}
+     */
+    getTranslatedName = name => {
+        const { language } = this.props
+        if (name === undefined || name === null) {
+            return ''
+        }
+        return language === 'fr' ? name.intituleFr : name.intituleAr
+    }
+
+    /**
+     * Edit User
+     *
+     * @param{object} newData
+     * @memberof Index
+     */
+    editUser = newData => {
+        const { edit } = this.props
+        if (newData.value.length === 0) return
+
+        if (newData.name === 'dateNaissance') {
+            edit({ date_naissance: newData.value })
+        } else {
+            edit({ email: newData.value })
+        }
+    }
+
+    /**
+     * Format Date
+     *
+     * @param{string} date
+     * @memberof Index
+     */
+    formatDate = date => {
+        if (!date) return null
+        try {
+            const currentDatetime = new Date(date)
+            return `${currentDatetime.getDate()}-${currentDatetime.getMonth() +
+                1}-${currentDatetime.getFullYear()}`
+        } catch (e) {
+            console.error(e)
+            return null
+        }
+    }
+
+    /**
+     * Field Validator
+     *
+     * @param {object} data
+     * @return {bool}
+     * @memberof Index
+     */
+    fieldValidator = data => {
+        const { value } = data
+        if (data.name === 'dateNaissance') {
+            // check if date valid
+            // eslint-disable-next-line no-useless-escape
+            const pattern = /(\d{2})\-(\d*)-(\d{4})/
+            const val = value.replace(pattern, '$3-$2-$1')
+            const date = new Date(val)
+            const dateNow = new Date()
+            // eslint-disable-next-line no-restricted-globals
+            if (isNaN(date) || dateNow.getTime() &lt; date.getTime()) {
+                const { intl } = this.props
+                this.setState({
+                    showAlert: true,
+                    err: true,
+                    msgErr: intl.formatMessage({ id: 'editFailed' }),
+                })
+                return false
+            }
+        }
+        this.setState({
+            showAlert: false,
+            err: false,
+        })
+        return true
+    }
+
+    /**
+     * Get Msg response
+     *
+     * @param {string} language
+     * @param {object} response
+     * @memberof Index
+     */
+    getMsgResponse = (language, response) => {
+        let result = ''
+        if (!response.data.data) {
+            return
+        }
+        const selectedField = response.data.data.date_naissance
+            ? 'date_naissance'
+            : 'email'
+        if (selectedField === 'email') {
+            result =
+                language === 'fr'
+                    ? response.data.data.email.fr
+                    : response.data.data.email.ar
+        } else {
+            result =
+                language === 'fr'
+                    ? response.data.data.date_naissance.fr
+                    : response.data.data.date_naissance.ar
+        }
+        // eslint-disable-next-line consistent-return
+        return result
+    }
+
+    render() {
+        const { showAlert, err, msgErr } = this.state
+        return (
+            &lt;div style={{ width: 'fit-content', margin: '10px auto' }}>
+                {/* TODO: add alert */}
+                {showAlert &amp;&amp; err &amp;&amp; (
+                    &lt;div className="alert alert-danger" role="alert">
+                        {msgErr}
+                    &lt;/div>
+                )}
+                {showAlert &amp;&amp; !err &amp;&amp; (
+                    &lt;div className="alert alert-success" role="alert">
+                        {msgErr}
+                    &lt;/div>
+                )}
+                &lt;MaterialTable
+                    columns={this.payload().columns}
+                    data={this.payload().data}
+                    options={{
+                        toolbar: false,
+                        showTitle: false,
+                        search: false,
+                        sorting: false,
+                        paging: false,
+                        header: false,
+                        detailPanelColumnAlignment: 'right',
+                        actionsColumnIndex: -1,
+                        rowStyle: rowData => ({
+                            display: rowData.value ? '' : 'none',
+                        }),
+                    }}
+                    editable={{
+                        isEditable: currentField => {
+                            if (
+                                currentField.name === 'email' ||
+                                currentField.name === 'dateNaissance'
+                            )
+                                return true
+                            return false
+                        },
+                        onRowUpdate: (newData, oldData) =>
+                            new Promise(resolve => {
+                                setTimeout(() => {
+                                    {
+                                        const { data } = this.payload()
+                                        const index = data.indexOf(oldData)
+                                        data[index] = newData
+                                        if (
+                                            this.fieldValidator(newData) &amp;&amp;
+                                            newData.value !== oldData.value
+                                        )
+                                            this.editUser(newData)
+                                    }
+                                    resolve()
+                                }, 1000)
+                            }),
+                    }}
+                />
+            &lt;/div>
+        )
+    }
+}
+Index.defaultProps = {
+    language: '',
+    error: false,
+    success: false,
+    response: '',
+    userDetails: {},
+}
+Index.propTypes = {
+    language: PropTypes.string,
+    response: PropTypes.string,
+    error: PropTypes.bool,
+    success: PropTypes.bool,
+    intl: PropTypes.object.isRequired,
+    edit: PropTypes.func.isRequired,
+    userDetails: PropTypes.object,
+}
+
+const mapStateToProps = ({ info, user, referencial, login }) => ({
+    language: info.language,
+    response: user.editUser.response,
+    error: user.editUser.error,
+    success: user.editUser.success,
+    allReferenciels: referencial.allReferencials.response,
+    userDetails: login.response.User.details,
+})
+
+const mapDispatchToProps = dispatch => ({
+    edit: payload => dispatch(editUserActions.editUserRequest(payload)),
+    getAllReferentiels: () =>
+        dispatch(getAllReferenceActions.getAllReferenceRequest()),
+})
+export default connect(
+    mapStateToProps,
+    mapDispatchToProps
+)(injectIntl(Index))
+</code></pre>
+                </article>
+            </section>
+        </div>
+
+        <nav>
+            <h2><a href="index.html">Home</a></h2>
+            <h3>Classes</h3>
+            <ul>
+                <li><a href="AccessForm.html">AccessForm</a></li>
+                <li><a href="AccessForm.AccessForm.html">AccessForm</a></li>
+                <li><a href="AddReferentiel.html">AddReferentiel</a></li>
+                <li>
+                    <a href="AddReferentiel.AddReferentiel.html"
+                        >AddReferentiel</a
+                    >
+                </li>
+                <li><a href="AddUniteRegionale.html">AddUniteRegionale</a></li>
+                <li>
+                    <a href="AddUniteRegionale.AddUniteRegionale.html"
+                        >AddUniteRegionale</a
+                    >
+                </li>
+                <li><a href="DemandeList.html">DemandeList</a></li>
+                <li><a href="DemandeList.DemandeList.html">DemandeList</a></li>
+                <li><a href="EditDemande.html">EditDemande</a></li>
+                <li><a href="EditDemande.EditDemande.html">EditDemande</a></li>
+                <li><a href="EditDemandFactory.html">EditDemandFactory</a></li>
+                <li><a href="ListReferentiels.html">ListReferentiels</a></li>
+                <li>
+                    <a href="ListReferentiels.ListReferentiels.html"
+                        >ListReferentiels</a
+                    >
+                </li>
+                <li>
+                    <a href="ListUniteRegionale.html">ListUniteRegionale</a>
+                </li>
+                <li>
+                    <a href="ListUniteRegionale.ListUniteRegionale.html"
+                        >ListUniteRegionale</a
+                    >
+                </li>
+                <li><a href="MapBlock.html">MapBlock</a></li>
+                <li><a href="Index.html">Index</a></li>
+                <li><a href="Index.Index.html">Index</a></li>
+                <li><a href="Signup.html">Signup</a></li>
+                <li><a href="Signup.Signup.html">Signup</a></li>
+            </ul>
+            <h3>Global</h3>
+            <ul>
+                <li><a href="global.html#DateExam">DateExam</a></li>
+            </ul>
+        </nav>
+
+        <br class="clear" />
+
+        <footer>
+            Documentation generated by
+            <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.3</a> on Thu Sep
+            19 2019 10:07:37 GMT+0100 (GMT+01:00)
+        </footer>
+
+        <script>
+            prettyPrint()
+        </script>
+        <script src="scripts/linenumber.js"></script>
+    </body>
+</html>

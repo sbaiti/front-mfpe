@@ -1,0 +1,19 @@
+/* Setup */
+@import 'base/variables';
+// @import "base/fonts";
+@import 'base/mixins';
+
+/* Vendor */
+@import '~bootstrap/scss/bootstrap';
+
+@import 'base/globals';
+
+/* Components */
+@import 'components/home/mapBlock';
+@import 'components/home/contentBlock';
+@import 'components/sidebar/icons';
+@import 'components/dashboard/notificationsList';
+
+/* Containers */
+
+/* Pages */

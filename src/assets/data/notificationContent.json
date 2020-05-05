@@ -1,0 +1,32 @@
+[
+    {
+        "id": 0,
+        "fr": "",
+        "ar": "",
+        "color": ""
+    },
+    {
+        "id": 1,
+        "fr": "La demande n°%demandeId a  été réfusée de la part du centre %centreName.",
+        "ar": "تم رفض رقم الطلب %demandeId من قبل المركز %centreName.",
+        "color": "red"
+    },
+    {
+        "id": 2,
+        "fr": "Le PV d'examen de la demande n°%demandeId a été uploadé avec succès de la part du centre %centerName.",
+        "ar": "تم تحميل ملف الفحص الكهربي للفحص التطبيقي %demandeId من المركز %centerName.",
+        "color": "blue"
+    },
+    {
+        "id": 3,
+        "fr": "Le PV d'examen de la demande n°%demandeId a été accepté par la direction régionale %drName.",
+        "ar": "تم قبول تقرير فحص رقم الطلب %demandeId من قبل الإدارة الإقليمية %drName.",
+        "color": "green"
+    },
+    {
+        "id": 4,
+        "fr": "Cher %fullName, nous avons le regret de vous annoncer votre non qualification à l’examen qui correspond à votre demande n°%demandeId",
+        "ar": "%fullName ، نأسف لإبلاغك بعدم أهليتك للامتحان الذي يتوافق مع طلبك رقم %demandeId",
+        "color": "dark"
+    }
+]

@@ -1,0 +1,24 @@
+.sidebar-list {
+    .list-item {
+        cursor: pointer;
+        fill: $secondary;
+
+        &:hover {
+            path {
+                fill: $primary;
+            }
+        }
+        &.subitem {
+            span {
+                font-size: 0.9rem;
+            }
+        }
+        &.subsubitem {
+            span {
+                margin: 0 2rem;
+                font-size: 0.8rem;
+                font-weight: bolder;
+            }
+        }
+    }
+}
